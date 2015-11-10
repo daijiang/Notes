@@ -1,0 +1,2254 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\begin_modules
+knitr
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman palatino
+\font_sans default
+\font_typewriter default
+\font_default_family rmdefault
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.5cm
+\topmargin 2.5cm
+\rightmargin 2.5cm
+\bottommargin 2.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chunk
+<<setup, include=FALSE, cache=FALSE>>= 
+\end_layout
+
+\begin_layout Chunk
+opts_chunk$set(fig.align='center', cache=TRUE, tidy=TRUE, eval=FALSE, out.width='0.
+6
+\backslash
+
+\backslash
+textwidth') 
+\end_layout
+
+\begin_layout Chunk
+options(width = 75, replace.assign = TRUE)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Title
+ggplot2 notes
+\end_layout
+
+\begin_layout Author
+Daijiang Li
+\end_layout
+
+\begin_layout Section
+Getting started with qplot (quick-plot)
+\end_layout
+
+\begin_layout Subsection
+Basic use
+\end_layout
+
+\begin_layout Chunk
+<<data, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+library("ggplot2", lib.loc="C:/Program Files/R/library") 
+\end_layout
+
+\begin_layout Chunk
+library(mgcv)
+\end_layout
+
+\begin_layout Chunk
+set.seed(1410)
+\end_layout
+
+\begin_layout Chunk
+dsmall <- diamonds[sample(nrow(diamonds), 100),]
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+<<basicuse>>=
+\end_layout
+
+\begin_layout Chunk
+## Basic use 
+\end_layout
+
+\begin_layout Chunk
+qplot(x,y,data=,color=,shape=,size=,alpha=,geom=,method=,formula=,facets=,xlin=,
+ylim=,xlab=,ylab=,main=,sub=)
+\end_layout
+
+\begin_layout Chunk
+#color,shape,size,fill: associates the levels of variable with symbol color,
+ shape, or size.
+\end_layout
+
+\begin_layout Chunk
+#method: "smooth","lm","gam" for generalized additive models(mgcv package),
+ "rlm" for robust regression (MASS package).
+\end_layout
+
+\begin_layout Chunk
+#formula=y~x.
+ use letters x and y, not the names of variables.
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, price,data=diamonds) 
+\end_layout
+
+\begin_layout Chunk
+qplot(log(carat), log(price),data=diamonds) 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, x*y*z, data=diamonds)
+\end_layout
+
+\begin_layout Chunk
+
+\end_layout
+
+\begin_layout Chunk
+#aesthetic attributes 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, price,data=diamonds, alpha=I(1/10)) 
+\end_layout
+
+\begin_layout Chunk
+    #alpha aesthetics using I(), value from 0-comp transparent to 1, e.g.1/10.
+\end_layout
+
+\begin_layout Chunk
+
+\end_layout
+
+\begin_layout Chunk
+#colour, shape 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,price,data=dsmall,colour=color) 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,price,data=dsmall,shape=cut)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Plot geom
+\end_layout
+
+\begin_layout Standard
+Geom, short for geometric object, describes the type of object that is used
+ to display the data.
+ Here we’ll introduce the most common and useful geoms, organised by the
+ dimensionality of data that they work with.
+ 
+\end_layout
+
+\begin_layout Standard
+The following geoms enable you to investigate two-dimensional relationships:
+\end_layout
+
+\begin_layout Itemize
+geom = "point" draws points to produce a scatterplot.
+ This is the default when you supply both x and y arguments to qplot().
+\end_layout
+
+\begin_layout Itemize
+geom = "smooth" fits a smoother to the data and displays the smooth and
+ its standard error.
+ 
+\end_layout
+
+\begin_layout Itemize
+geom = "boxplot" produces a box and whisker plot to summarise the distribution
+ of a set of points.
+ 
+\end_layout
+
+\begin_layout Itemize
+geom = "path" and geom = "line" draw lines between the data points.
+ Traditionally these are used to explore relationships between time and
+ another variable, but lines may be used to join observations connected
+ in some other way.
+ A line plot is constrained to produce lines that travel from left to right,
+ while paths can go in any direction.
+ 
+\end_layout
+
+\begin_layout Standard
+For 1d distributions, your choice of geoms is guided by the variable type:
+ 
+\end_layout
+
+\begin_layout Itemize
+For continuous variables, geom = "histogram" draws a histogram, geom = "freqpoly
+" a frequency polygon, and geom = "density" creates a density plot.
+ The 
+\series bold
+histogram geom is the default when you only supply an x value to qplot()
+\series default
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+For discrete variables, geom = "bar" makes a bar chart.
+\end_layout
+
+\begin_layout Chunk
+<<geom1>>=
+\end_layout
+
+\begin_layout Chunk
+#points and smooth
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, price, data=dsmall,geom=c("point","smooth"))
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, price, data=dsmall,geom=c("point","smooth"),se=FALSE) # turn
+ off CI
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, price, data=dsmall,geom=c("point","smooth"),span=0.5) # wiggliness
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+Methods for smooth:
+\end_layout
+
+\begin_layout Itemize
+for small n, default is: method= "loess".
+ Wiggliness of the line is controlled by span from 0 (exceedingly wiggly)
+ to 1 (not so wiggly, smooth).
+ 
+\end_layout
+
+\begin_layout Itemize
+You could also load the
+\family typewriter
+ mgcv
+\family default
+ library and use 
+\begin_inset Formula $method="gam",formula=y~s(x)$
+\end_inset
+
+ to fit a generalised additive model.
+ This is similar to using a spline with lm, but the degree of smoothness
+ is estimated from the data.
+ For large data, use the formula 
+\begin_inset Formula $y~s(x,bs="cs")$
+\end_inset
+
+.
+ This is used by default when there are more than 1,000 points.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $method=”lm”$
+\end_inset
+
+fits a linear model.
+ The default will fit a straight line to your data, or you can specify 
+\begin_inset Formula $formula=y~poly(x,2)$
+\end_inset
+
+ to specify a degree 2 polynomial, or better, load splines package and use
+ a natural spline: 
+\begin_inset Formula $formula=y~ns(x,2)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $method=”rlm”$
+\end_inset
+
+works like lm, but uses a robust fitting algorithm so that outliers don’t
+ affect the fit as much.
+\end_layout
+
+\begin_layout Chunk
+<<geom2>>=
+\end_layout
+
+\begin_layout Chunk
+library(mgcv)
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, price, data=dsmall,geom=c("point","smooth"),method="gam", formula=y
+~s(x, bs="cs"))
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+How the values of the continuous variables vary with the levels of the categoric
+al variable? We can use boxplots and jittered points.
+ For jittered points, qplot offers the same control over aesthetics as it
+ does for a normal scatterplot: size, colour and shape.
+ For boxplots you can control the outline colour, the internal fill colour
+ and the size of the lines.
+\end_layout
+
+\begin_layout Chunk
+<<geom3>>=
+\end_layout
+
+\begin_layout Chunk
+#jitter and boxplot
+\end_layout
+
+\begin_layout Chunk
+qplot(color, price/carat, data=diamonds, geom="jitter", alpha=I(1/10))
+\end_layout
+
+\begin_layout Chunk
+qplot(color, price/carat, data=diamonds, geom="boxplot")
+\end_layout
+
+\begin_layout Chunk
+qplot(color, price/carat, data=diamonds, geom=c("jitter","boxplot"),alpha=I(0.5),
+colour=color)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+Histogram and density plots show the distribution of a single variable.
+ For the density plot, the adjust argument controls the degree of smoothness
+ (high values of adjust produce smoother plots).
+ For the histogram, the binwidth argument controls the amount of smoothing
+ by setting the bin size.
+ (Break points can also be specified explicitly, using the breaks argument.)
+\end_layout
+
+\begin_layout Chunk
+<<geom4>>=
+\end_layout
+
+\begin_layout Chunk
+#histogram and density
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,data=diamonds,geom="histogram", binwidth=0.1,xlim=c(0,3),colour
+ = I("darkgreen"), fill = I("white")) 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,data=diamonds,geom="histogram", fill=color) 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,data=diamonds,geom="density") 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,data=diamonds,geom="density",adjust=.1) 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,data=diamonds,geom="density", colour=color)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+Bar charts.
+ The discrete analogue of histogram is the bar chart, geom = "bar".
+ The bar geom counts the number of instances of each class so that you don’t
+ need to tabulate your values beforehand, as with barchart in base R.
+ If the data has already been tabulated or if you’d like to tabulate class
+ members in some other way, such as by summing up a continuous variable,
+ you can use the weight geom.
+\end_layout
+
+\begin_layout Chunk
+<<geom5>>=
+\end_layout
+
+\begin_layout Chunk
+#barchart
+\end_layout
+
+\begin_layout Chunk
+qplot(color,data=diamonds, geom="bar") # try fill=color
+\end_layout
+
+\begin_layout Chunk
+qplot(color,data=diamonds, geom="bar",weight=carat)+scale_y_continuous("carat")
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+Line and path plots are typically used for time series data.
+ Line plots join the points from left to right, while path plots join them
+ in the order that they appear in the dataset (a line plot is just a path
+ plot of the data sorted by x value).
+ Line plots usually have time on the x-axis, showing how a single variable
+ has changed over time.
+ Path plots show how two variables have simultaneously changed over time,
+ with time encoded in the way that the points are joined together.
+\end_layout
+
+\begin_layout Chunk
+<<geom6>>=
+\end_layout
+
+\begin_layout Chunk
+#Line and path graph
+\end_layout
+
+\begin_layout Chunk
+qplot(date,unemploy/pop,data=economics,geom="line")
+\end_layout
+
+\begin_layout Chunk
+year <- function(x) as.POSIXlt(x)$year + 1900 # e.g.1967
+\end_layout
+
+\begin_layout Chunk
+qplot(unemploy / pop, uempmed, data = economics,geom = c("point", "path"))
+ 
+\end_layout
+
+\begin_layout Chunk
+qplot(unemploy / pop, uempmed, data = economics,geom = "path", colour =
+ year(date)) + scale_area()
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Faceting
+\end_layout
+
+\begin_layout Standard
+We have already discussed using aesthetics (colour and shape) to compare
+ subgroups, drawing all groups on the same plot.
+ Faceting takes an alternative approach: It creates tables of graphics by
+ splitting the data into subsets and displaying the same graph for each
+ subset in an arrangement that facilitates comparison.
+ The default faceting method in qplot() creates plots arranged on a grid
+ specified by a faceting formula which looks like row var~col var.To facet
+ on only one of columns or rows, use .
+ as a place holder.
+ For example, row var ~ .
+ will create a single column with multiple rows.
+ The ..density..
+ syntax is new.
+ The y-axis of the histogram does not come from the original data, but from
+ the statistical transformation that counts the number of observations in
+ each bin.
+ Using ..density..
+ tells ggplot2 to map the density to the y-axis instead of the default use
+ of count.
+\end_layout
+
+\begin_layout Chunk
+<<facet1>>=
+\end_layout
+
+\begin_layout Chunk
+#Facet
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, data = diamonds, facets = color ~ ., geom = "histogram", binwidth
+ = 0.1, xlim = c(0, 3)) 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, ..density.., data = diamonds, facets = color ~ .,geom = "histogram",
+ binwidth = 0.1, xlim = c(0, 3))
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Other options
+\end_layout
+
+\begin_layout Standard
+These are a few other qplot options to control the graphic’s appearance.
+ These all have the same effect as their plot equivalents: xlim, ylim, log,
+ main, xlab, ylab, etc.
+\end_layout
+
+\begin_layout Section
+Mastering the grammer
+\end_layout
+
+\begin_layout Subsection
+Scatterplot
+\end_layout
+
+\begin_layout Chunk
+<<scatterplot>>=
+\end_layout
+
+\begin_layout Chunk
+#scatterplot
+\end_layout
+
+\begin_layout Chunk
+qplot(displ, hwy, data = mpg, colour = factor(cyl))
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+A scatterplot represents each observation as a point (•), positioned according
+ to the value of two variables.
+ As well as a horizontal and vertical position, each point also has 
+\emph on
+a size, a colour and a shape
+\emph default
+.
+ These attributes are called 
+\series bold
+aesthetics
+\series default
+, and are the properties that can be perceived on the graphic.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Points, lines and bars
+\emph default
+ are all examples of geometric objects, or 
+\series bold
+geoms
+\series default
+.
+ Geoms determine the “type” of the plot.
+ 
+\end_layout
+
+\begin_layout Standard
+We need to convert them from data units (e.g., litres, miles per gallon and
+ number of cylinders) to physical units (e.g., pixels and colours) that the
+ computer can display.
+ This conversion process is called 
+\series bold
+scaling
+\series default
+ and performed by scales.
+\end_layout
+
+\begin_layout Standard
+A final step determines how the two positions (x and y) are combined to
+ form the final location on the plot.
+ This is done by the coordinate system, or 
+\series bold
+coord
+\series default
+.
+ In most cases this will be Cartesian coordinates, but it might be polar
+ coordinates, or a spherical projection used for a map.
+\end_layout
+
+\begin_layout Standard
+Finally, we need to render this data to create the graphical objects that
+ are displayed on the screen.
+ To create a complete plot we need to combine graphical objects from three
+ sources: the 
+\emph on
+data
+\emph default
+, represented by the point geom; the 
+\emph on
+scales and coordinate system
+\emph default
+, which generate axes and legends so that we can read values from the graph;
+ and 
+\emph on
+plot annotations
+\emph default
+, such as the background and plot title.
+\end_layout
+
+\begin_layout Subsection
+A more complex plot
+\end_layout
+
+\begin_layout Chunk
+<<complexplot>>=
+\end_layout
+
+\begin_layout Chunk
+qplot(displ, hwy, data=mpg, facets = .
+ ~ year) + geom_smooth()
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+This plot adds three new components to the mix: facets, multiple layers
+ and statistics.
+ The facets and layers expand the data structure described above: each facet
+ panel in each layer has its own dataset.
+ You can think of this as a 3d array: the panels of the facets form a 2d
+ grid, and the layers extend upwards in the 3rd dimension.
+ In this case the data in the layers is the same, but in general 
+\emph on
+we can plot different datasets on different layers
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The smooth layer is different to the point layer because it doesn’t display
+ the raw data, but instead displays a statistical transformation of the
+ data.
+ Specifically, the smooth layer fits a smooth line through the middle of
+ the data.
+ This requires an additional step in the process described above: after
+ mapping the data to aesthetics, the data is passed to a statistical transformat
+ion, or 
+\series bold
+stat
+\series default
+, which manipulates the data in some useful way.
+\end_layout
+
+\begin_layout Standard
+As well as adding an additional step to summarise the data, we also need
+ some extra steps when we get to the scales.
+ This is because we now have multiple datasets (for the different facets
+ and layers) and we need to make sure that the scales are the same across
+ all of them.
+ Scaling actually occurs in three parts: transforming, training and mapping.
+ Scale transformation occurs before statistical transformation so that statistic
+s are computed on the scale-transformed data.
+ This ensures that a plot of log(x) vs.
+ log(y) on linear scales looks the same as x vs.
+ y on log scales.
+ There are many different transformations that can be used, including taking
+ square roots, logarithms and reciprocals.After the statistics are computed,
+ each scale is trained on every dataset from all the layers and facets.
+ The training operation combines the ranges of the individual datasets to
+ get the range of the complete data.
+ Without this step, scales could only make sense locally and we wouldn’t
+ be able to overlay different layers because their positions wouldn’t line
+ up.
+ Finally the scales map the data values into aesthetic values.
+\end_layout
+
+\begin_layout Standard
+Faceting, a general case of the conditioned or trellised plots, makes it
+ easy to create small multiples each showing a different subset of the whole
+ dataset.
+\end_layout
+
+\begin_layout Subsection
+Data structures
+\end_layout
+
+\begin_layout Standard
+A plot object is a list with components 
+\emph on
+data, mapping
+\emph default
+ (the default aesthetic mappings),
+\emph on
+ layers, scales, coordinates
+\emph default
+ and 
+\emph on
+facet
+\emph default
+.
+ The plot object has one other component we haven’t discussed yet: 
+\emph on
+options
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+Plots can be created in two ways: all at once with 
+\family typewriter
+qplot()
+\family default
+, as shown in the previous chapter, or piece-by-piece with 
+\family typewriter
+ggplot()
+\family default
+ and layer functions.
+ Once you have a plot object, there are a few things you can do with it:
+ 
+\end_layout
+
+\begin_layout Itemize
+Render it on screen, with 
+\family typewriter
+print()
+\family default
+.
+ This happens automatically when running interactively, but inside a loop
+ or function, you’ll need to 
+\family typewriter
+print()
+\family default
+ it yourself.
+ 
+\end_layout
+
+\begin_layout Itemize
+Render it to disk, with 
+\family typewriter
+ggsave()
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+Briefly describe its structure with 
+\family typewriter
+summary()
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+Save a cached copy of it to disk, with 
+\family typewriter
+save()
+\family default
+.
+ This saves a complete copy of the plot object, so you can easily re-create
+ that exact plot with 
+\family typewriter
+load()
+\family default
+.
+ Note that data is stored inside the plot, so that if you change the data
+ outside of the plot, and then redraw a saved plot, it will not be updated.
+\end_layout
+
+\begin_layout Chunk
+<<data_structure>>=
+\end_layout
+
+\begin_layout Chunk
+p = qplot(displ, hwy, data = mpg, colour = factor(cyl)) 
+\end_layout
+
+\begin_layout Chunk
+summary(p) 
+\end_layout
+
+\begin_layout Chunk
+save(p, file = "plot.rdata") # Save plot object to disk 
+\end_layout
+
+\begin_layout Chunk
+load("plot.rdata") # Load from disk 
+\end_layout
+
+\begin_layout Chunk
+ggsave("plot.png", width = 5, height = 5) # Save png to disk
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Section
+Build a plot layer by layer
+\end_layout
+
+\begin_layout Standard
+Layering is the mechanism by which additional data elements are added to
+ a plot.
+ Each layer can come from a different dataset and have a different aesthetic
+ mapping, allowing us to create plots that could not be generated using
+ 
+\family typewriter
+qplot()
+\family default
+, which permits only a single dataset and a single set of aesthetic mappings.
+\end_layout
+
+\begin_layout Subsection
+Creating a plot
+\end_layout
+
+\begin_layout Standard
+When we used 
+\family typewriter
+qplot()
+\family default
+, it did a lot of things for us: it created a plot object, added layers,
+ and displayed the result, using many default values along the way.
+ To create the plot object ourselves, we use 
+\family typewriter
+ggplot()
+\family default
+.
+ This has two arguments: 
+\series bold
+data
+\series default
+ and aesthetic 
+\series bold
+mapping
+\series default
+.
+ These arguments set up defaults for the plot and can be omitted if you
+ specify data and aesthetics when adding each layer.
+ You are already familiar with aesthetic mappings from 
+\family typewriter
+qplot()
+\family default
+, and the syntax here is quite similar, although you need to wrap the pairs
+ of aesthetic attribute and variable name in the 
+\family typewriter
+\series bold
+aes()
+\family default
+\series default
+ function.
+\end_layout
+
+\begin_layout Chunk
+<<creatingaplot>>=
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(diamonds, aes(carat,price,colour=cut))
+\end_layout
+
+\begin_layout Chunk
+#This plot object cannot be displayed until we add a layer: there is nothing
+ to see!
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Layers
+\end_layout
+
+\begin_layout Standard
+A minimal layer may do nothing more than specify a geom, a way of visually
+ representing the data.
+\end_layout
+
+\begin_layout Chunk
+<<layer>>=
+\end_layout
+
+\begin_layout Chunk
+p=p+layer(geom="point")
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+This layer uses the plot defaults for data and aesthetic mapping and it
+ uses default values for two optional arguments: the statistical transformation
+ (the stat) and the position adjustment.
+ A more fully specified layer can take any or all of these arguments:
+\end_layout
+
+\begin_layout Chunk
+<<layeraug>>=
+\end_layout
+
+\begin_layout Chunk
+#arguments for layers
+\end_layout
+
+\begin_layout Chunk
+layer(geom,geom_params,stat_params,data,mapping,position)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+<<layer1,eval=TRUE, out.width='0.4
+\backslash
+
+\backslash
+textwidth',fig.show='hold'>>=
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(diamonds,aes(x=carat)) 
+\end_layout
+
+\begin_layout Chunk
+p1=p+layer(geom="bar",geom_params=list(fill="steelblue"),stat="bin",stat_params=
+list(binwidth=2))
+\end_layout
+
+\begin_layout Chunk
+q=ggplot(diamonds,aes(x=carat)) 
+\end_layout
+
+\begin_layout Chunk
+q=p+layer(geom="bar",geom_params=list(fill="steelblue"),stat="bin",stat_params=l
+ist(binwidth=0.5))
+\end_layout
+
+\begin_layout Chunk
+p1;q
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+This layer specification is precise but verbose.
+ We can simplify it by using shortcuts that rely on the fact that 
+\emph on
+every geom is associated with a default statistic and position, and every
+ statistic with a default geom
+\emph default
+.
+ This means that you only need to specify one of stat or geom to get a completel
+y specified layer, with parameters passed on to the geom or stat as appropriate.
+ This expression generates the same layer as the full layer command above:
+\end_layout
+
+\begin_layout Chunk
+<<layer1_1>>=
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(diamonds,aes(x=carat)) 
+\end_layout
+
+\begin_layout Chunk
+p=p+geom_histogram(binwidth = 2, fill = "steelblue")
+\end_layout
+
+\begin_layout Chunk
+p
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+All the shortcut functions have the same basic form, beginning with geom_
+ or stat_:   
+\end_layout
+
+\begin_layout Chunk
+<<layer2>>=
+\end_layout
+
+\begin_layout Chunk
+#arguments for geom_ or stat_
+\end_layout
+
+\begin_layout Chunk
+geom_XXX(mapping, data, ..., geom, position) 
+\end_layout
+
+\begin_layout Chunk
+stat_XXX(mapping, data, ..., stat, position)
+\end_layout
+
+\begin_layout Chunk
+#mapping first, since almost always use the same data.
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Itemize
+mapping (optional): A set of aesthetic mappings, specified using the 
+\family typewriter
+aes()
+\family default
+ function and combined with the plot defaults.
+ 
+\end_layout
+
+\begin_layout Itemize
+data (optional): A dataset which overrides the default plot dataset.
+ It is most commonly omitted, in which case the layer will use the default
+ plot data.
+\end_layout
+
+\begin_layout Itemize
+...: Parameters for the geom or stat, such as bin width in the histogram or
+ bandwidth for a loess smoother.
+ You can also use aesthetic properties as parameters.
+ When you do this you set the property to a fixed value, not map it to a
+ variable in the dataset.
+ The example above showed setting the fill colour of the histogram to “steelblue
+”.
+ 
+\end_layout
+
+\begin_layout Itemize
+geom or stat (optional): You can override the default stat for a geom, or
+ the default geom for a stat.
+ This is a text string containing the name of the geom to use.
+ Using the default will give you a standard plot; overriding the default
+ allows you to achieve something more exotic
+\end_layout
+
+\begin_layout Itemize
+position (optional): Choose a method for adjusting overlapping objects.
+\end_layout
+
+\begin_layout Standard
+Layers can be added to plots created with 
+\family typewriter
+ggplot()
+\family default
+ or 
+\family typewriter
+qplot()
+\family default
+.
+ Remember, behind the scenes, 
+\family typewriter
+qplot()
+\family default
+ is doing exactly the same thing: it creates a plot object and then adds
+ layers.
+ The following example shows the equivalence among these ways of making
+ plots.
+\end_layout
+
+\begin_layout Chunk
+<<layer3>>=
+\end_layout
+
+\begin_layout Chunk
+qplot(sleep_rem/sleep_total,awake, data=msleep)+geom_smooth() 
+\end_layout
+
+\begin_layout Chunk
+qplot(sleep_rem/sleep_total,awake, data=msleep,geom=c("point","smooth"))
+ 
+\end_layout
+
+\begin_layout Chunk
+ggplot(msleep,aes(sleep_rem/sleep_total,awake))+geom_point()+geom_smooth()
+\end_layout
+
+\begin_layout Chunk
+#store layer as variable, to reduce duplication
+\end_layout
+
+\begin_layout Chunk
+bestfit=geom_smooth(method="lm",se=F,colour="steelblue", alpha=1,size=1)
+ 
+\end_layout
+
+\begin_layout Chunk
+qplot(sleep_rem,sleep_total,data=msleep)+bestfit 
+\end_layout
+
+\begin_layout Chunk
+qplot(awake,brainwt,data=msleep,log="y")+bestfit
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Data
+\end_layout
+
+\begin_layout Standard
+The restriction on the data is simple: it must be a data frame.
+ You can replace the old dataset with %+%, as shown in the following example.
+ 
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+p <- ggplot(mtcar, aes(mpg, wt, colour = cyl)) + geom_point();p 
+\end_layout
+
+\begin_layout Chunk
+mtcar <- transform(mtcars, mpg = mpg ^ 2) 
+\end_layout
+
+\begin_layout Chunk
+p %+% mtcar
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+Any change of values or dimensions is legitimate.
+ However, if a variable changes from discrete to continuous (or vice versa),
+ you will need to change the default scales, It is not necessary to specify
+ a default dataset except when using faceting; faceting is a global operation
+ (i.e., it works on all layers) and it needs to have a base dataset which
+ defines the set of facets for all datasets.
+ 
+\end_layout
+
+\begin_layout Standard
+The data is stored in the plot object as a copy, not a reference.
+ This has two important consequences: if your data changes, the plot will
+ not; and ggplot2 objects are entirely self-contained so that they can be
+ save()d to disk and later load()ed and plotted without needing anything
+ else from that session.
+\end_layout
+
+\begin_layout Subsection
+Aesthetic mappings
+\end_layout
+
+\begin_layout Standard
+We use the 
+\family typewriter
+ase
+\family default
+ function to do this.
+ You should never refer to variables outside of the dataset (e.g., with diamonds$c
+arat).
+ The functions of variables can be used
+\family typewriter
+, e.g.
+ aes(x=weight, y=height, colour=sqrt(age))
+\family default
+.
+ The default aesthetic mappings can be set when the plot is initialised
+ or modified later using +, as in this example:
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+library(ggplot2)
+\end_layout
+
+\begin_layout Chunk
+#aesthetic mapping initially or later
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(mecars);p=p+aes(wt, hp) 
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(mtcars, aes(x=mpg, y=wt))# initialised 
+\end_layout
+
+\begin_layout Chunk
+p+geom_point()
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+The default mappings in the plot p can be extended or overridden in the
+ layers, as with the following code.
+ Aesthetic mappings specified in a layer affect only that layer.
+ For that reason, unless you modify the default scales, axis labels and
+ legend titles will be based on the plot defaults.
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+#aesthetic mapping for layers only
+\end_layout
+
+\begin_layout Chunk
+p + geom_point(aes(colour = factor(cyl))) 
+\end_layout
+
+\begin_layout Chunk
+p + geom_point(aes(y = disp)) 
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+## Setting VS.
+ Mapping!
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(mtcars, aes(mpg, wt))
+\end_layout
+
+\begin_layout Chunk
+p+geom_point(colour="darkblue")#setting
+\end_layout
+
+\begin_layout Chunk
+p+geom_point(aes(colour="darkblue"))
+\end_layout
+
+\begin_layout Chunk
+ #mapping, creat a new variable containing the value 'darkblue'.
+\end_layout
+
+\begin_layout Chunk
+qplot(mpg,wt, data=mtcars, colour=I("darkblue"))#use I() in qplot
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Grouping
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+##Multiple groups, one aesthetic
+\end_layout
+
+\begin_layout Chunk
+library(nlme) 
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(Oxboys, aes(age, height, group=Subject))+geom_line()
+\end_layout
+
+\begin_layout Chunk
+##Different groups on different layers.
+ 
+\end_layout
+
+\begin_layout Chunk
+p+geom_smooth(aes(group=Subject),method="lm",se=F) 
+\end_layout
+
+\begin_layout Chunk
+ #each subject has one smooth line
+\end_layout
+
+\begin_layout Chunk
+p+geom_smooth(aes(group=1),method="lm",se=F)
+\end_layout
+
+\begin_layout Chunk
+# group=1: use all data, one smooth line for all subjects.
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+
+\end_layout
+
+\begin_layout Chunk
+<<group1, eval=T,out.width='0.4
+\backslash
+
+\backslash
+textwidth',fig.show='hold'>>=
+\end_layout
+
+\begin_layout Chunk
+##Overriding the default grouping.
+ 
+\end_layout
+
+\begin_layout Chunk
+library(ggplot2)
+\end_layout
+
+\begin_layout Chunk
+library(nlme)
+\end_layout
+
+\begin_layout Chunk
+boysbox=ggplot(Oxboys, aes(Occasion, height))+geom_boxplot() 
+\end_layout
+
+\begin_layout Chunk
+#Occasion is discrete
+\end_layout
+
+\begin_layout Chunk
+boysbox
+\end_layout
+
+\begin_layout Chunk
+boysbox+geom_line(aes(group=Subject), colour="#3366FF")
+\end_layout
+
+\begin_layout Chunk
+# new group for new layer
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Geoms
+\end_layout
+
+\begin_layout Standard
+Geometric objects, or geoms for short, perform the actual rendering of the
+ layer, control the type of plot that you create.
+ For example, using a point geom will create a scatterplot, while using
+ a line geom will create a line plot.
+ Every geom has a default statistic, and every statistic a default geom.
+ For example, the bin statistic defaults to using the bar geom to produce
+ a histogram.
+\end_layout
+
+\begin_layout Subsection
+Stat
+\end_layout
+
+\begin_layout Standard
+A statistical transformation, or stat, transforms the data, typically by
+ summarising it in some manner.
+ For example, a useful stat is the smoother, which calculates the mean of
+ y, conditional on x, subject to some restriction that ensures smoothness.
+ A stat takes a dataset as input and returns a dataset as output, and so
+ a stat can add new variables to the original dataset.
+ It is possible to map aesthetics to these new variables.
+ For example, stat_bin, the statistic used to make histograms, produces
+ the following variables: 
+\family typewriter
+count
+\family default
+, the number of observations in each bin ; 
+\family typewriter
+density
+\family default
+, the density of observations in each bin (percentage of total / bar width);
+ 
+\family typewriter
+x
+\family default
+, the centre of the bin These generated variables can be used instead of
+ the variables present in the original dataset.
+ The names of generated variables must be surrounded with
+\family typewriter
+ ..
+ 
+\family default
+when used.
+ This prevents confusion in case the original dataset includes a variable
+ with the same name as a generated variable.
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+ggplot(diamonds,aes(carat))+geom_histogram(binwidth=0.1) #default use count
+ as y axis
+\end_layout
+
+\begin_layout Chunk
+ggplot(diamonds,aes(carat))+geom_histogram(aes(y=..density..),binwidth=0.1) 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat,..density..,data=diamonds,geom="histogram",binwidth=0.1)#qplot
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Pulling all together
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+##Combining geoms and stats
+\end_layout
+
+\begin_layout Chunk
+d=ggplot(diamonds,aes(carat))+xlim(0,3) 
+\end_layout
+
+\begin_layout Chunk
+d+stat_bin(aes(ymax=..count..),binwidth=0.1,geom="area") 
+\end_layout
+
+\begin_layout Chunk
+d+stat_bin(aes(size=..density..),binwidth=0.1,geom="point",position="identity")
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+model=lme(height~age, data=Oxboys, random=~1+age|Subject)#linear mixed model
+ 
+\end_layout
+
+\begin_layout Chunk
+oplot=ggplot(Oxboys,aes(age, height, group=Subject))+geom_line() 
+\end_layout
+
+\begin_layout Chunk
+age_grid=seq(-1,1,length=10) 
+\end_layout
+
+\begin_layout Chunk
+subjects=unique(Oxboys$Subject) 
+\end_layout
+
+\begin_layout Chunk
+preds=expand.grid(age=age_grid,Subject=subjects)
+\end_layout
+
+\begin_layout Chunk
+#creat a data frame from all combinations of factors 
+\end_layout
+
+\begin_layout Chunk
+Oxboys$fitted=predict(model) 
+\end_layout
+
+\begin_layout Chunk
+Oxboys$resid=with(Oxboys, fitted-height) 
+\end_layout
+
+\begin_layout Chunk
+oplot %+% Oxboys+aes(y=resid)+geom_smooth(aes(group=1)) #apply to different
+ data
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Section
+Toolbox
+\end_layout
+
+\begin_layout Subsection
+Basic plot types
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+geom_area() 
+\end_layout
+
+\begin_layout Chunk
+geom_bar(stat="identity") #default multiple bars in same location stacked
+ 
+\end_layout
+
+\begin_layout Chunk
+geom_line(); geom_path()# in the order 
+\end_layout
+
+\begin_layout Chunk
+geom_point() #scatterplot 
+\end_layout
+
+\begin_layout Chunk
+geom_polygon() 
+\end_layout
+
+\begin_layout Chunk
+geom_text() #need another aesthetic: label.
+ hjust, vjust, angle 
+\end_layout
+
+\begin_layout Chunk
+geom_tile() 
+\end_layout
+
+\begin_layout Chunk
+# examples
+\end_layout
+
+\begin_layout Chunk
+df=data.frame(x=c(3,1,5),y=c(2,4,6)) 
+\end_layout
+
+\begin_layout Chunk
+p=ggplot(df, aes(x,y))+xlab(NULL)+ylab(NULL) 
+\end_layout
+
+\begin_layout Chunk
+p+geom_point()+ggtitle("geom_point") 
+\end_layout
+
+\begin_layout Chunk
+p+geom_bar(stat="identity")+opts(title="geom_bar(stat=
+\backslash
+"identity
+\backslash
+")") 
+\end_layout
+
+\begin_layout Chunk
+p+geom_text(label=c("a","b","c"))+ggtitle("geom_text")
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Displaying distributions
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+depthdist=ggplot(diamonds, aes(depth))+xlim(58,68) 
+\end_layout
+
+\begin_layout Chunk
+depthdist+geom_histogram(aes(y=..density..),binwidth=0.1)+facet_grid(cut~.) 
+\end_layout
+
+\begin_layout Chunk
+depthdist+geom_freqpoly(aes(y=..density..,colour=cut),binwidth=0.1)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Drawing maps
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+#maps
+\end_layout
+
+\begin_layout Chunk
+library(maps) 
+\end_layout
+
+\begin_layout Chunk
+data(us.cities)
+\end_layout
+
+\begin_layout Chunk
+bigcities=subset(us.cities, pop>500000) 
+\end_layout
+
+\begin_layout Chunk
+p=qplot(long,lat,data=bigcities) p+borders("state",size=.5) 
+\end_layout
+
+\begin_layout Chunk
+wicities=subset(us.cities,country.etc=="WI") 
+\end_layout
+
+\begin_layout Chunk
+ggplot(wicities,aes(long,lat))+borders("county","wisconsin",colour="grey70")+geo
+m_point()
+\end_layout
+
+\begin_layout Chunk
+wi=map_data("county","wisconsin") 
+\end_layout
+
+\begin_layout Chunk
+mid_range=function(x) mean(range(x,na.rm=TRUE)) 
+\end_layout
+
+\begin_layout Chunk
+library(plyr)
+\end_layout
+
+\begin_layout Chunk
+centres=ddply(wi, .(subregion),colwise(mid_range,.(lat,long))) 
+\end_layout
+
+\begin_layout Chunk
+ggplot(wi, aes(long, lat)) + geom_polygon(aes(group = group),fill = NA,
+ colour = "grey60") + geom_text(aes(label = subregion), data = centres,
+ size = 4, angle = 0)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Section
+Toolbox
+\end_layout
+
+\begin_layout Subsection
+Basic plot types
+\end_layout
+
+\begin_layout Chunk
+<<eval=TRUE,out.width='0.3
+\backslash
+
+\backslash
+textwidth',fig.show='hold'>>=
+\end_layout
+
+\begin_layout Chunk
+df <- data.frame(x = c(3, 1, 5),y = c(2, 4, 6),label = c("a","b","c"))
+\end_layout
+
+\begin_layout Chunk
+p <- ggplot(df, aes(x, y, label = label)) +xlab(NULL) + ylab(NULL) 
+\end_layout
+
+\begin_layout Chunk
+p + geom_point() + ggtitle("geom_point") 
+\end_layout
+
+\begin_layout Chunk
+p + geom_bar(stat="identity") + ggtitle(( "geom_bar(stat=
+\backslash
+"identity
+\backslash
+"")) 
+\end_layout
+
+\begin_layout Chunk
+p + geom_line() + ggtitle( "geom_line") 
+\end_layout
+
+\begin_layout Chunk
+p + geom_area() + ggtitle("geom_area") 
+\end_layout
+
+\begin_layout Chunk
+p + geom_path() + ggtitle("geom_path") 
+\end_layout
+
+\begin_layout Chunk
+p + geom_text() + ggtitle("geom_text") 
+\end_layout
+
+\begin_layout Chunk
+p + geom_tile() + ggtitle("geom_tile") 
+\end_layout
+
+\begin_layout Chunk
+p + geom_polygon() + ggtitle("geom_polygon")
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+#xlim(low,high)
+\end_layout
+
+\begin_layout Chunk
+depth_dist <- ggplot(diamonds, aes(depth)) + xlim(58, 68) 
+\end_layout
+
+\begin_layout Chunk
+depth_dist + geom_histogram(aes(y = ..density..), binwidth = 0.1) + facet_grid(cut
+ ~ .) 
+\end_layout
+
+\begin_layout Chunk
+depth_dist + geom_histogram(aes(fill = cut), binwidth = 0.1, position = "fill")
+ 
+\end_layout
+
+\begin_layout Chunk
+depth_dist + geom_freqpoly(aes(y = ..density.., colour = cut), binwidth = 0.1)
+\end_layout
+
+\begin_layout Chunk
+qplot(cut, depth, data=diamonds, geom="boxplot") 
+\end_layout
+
+\begin_layout Chunk
+qplot(carat, depth, data=diamonds, geom="boxplot", group = round_any(carat,
+ 0.1, floor), xlim = c(0, 3))
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Dealing with overplotting
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+#shape or fuzzing
+\end_layout
+
+\begin_layout Chunk
+df <- data.frame(x = rnorm(2000), y = rnorm(2000)) 
+\end_layout
+
+\begin_layout Chunk
+norm <- ggplot(df, aes(x, y)) 
+\end_layout
+
+\begin_layout Chunk
+norm + geom_point() 
+\end_layout
+
+\begin_layout Chunk
+norm + geom_point(shape = 1) # hollow points 
+\end_layout
+
+\begin_layout Chunk
+norm + geom_point(shape = ".") # Pixel sized 
+\end_layout
+
+\begin_layout Chunk
+norm + geom_point(colour = "black", alpha= 1/5)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+#Jitter
+\end_layout
+
+\begin_layout Chunk
+td <- ggplot(diamonds, aes(table, depth)) +xlim(50, 70) + ylim(50, 70) 
+\end_layout
+
+\begin_layout Chunk
+td + geom_point() 
+\end_layout
+
+\begin_layout Chunk
+td + geom_jitter() 
+\end_layout
+
+\begin_layout Chunk
+jit <- position_jitter(width = 0.5) 
+\end_layout
+
+\begin_layout Chunk
+td + geom_jitter(position = jit) 
+\end_layout
+
+\begin_layout Chunk
+td + geom_jitter(position = jit, colour = "black", alpha= 1/5)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Section
+Scales, axes and legends
+\end_layout
+
+\begin_layout Subsection
+Scales: common arguments
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+p <- qplot(cty, hwy, data = mpg, colour = displ) 
+\end_layout
+
+\begin_layout Chunk
+p + scale_x_continuous("City mpg") 
+\end_layout
+
+\begin_layout Chunk
+p + xlab("City mpg") 
+\end_layout
+
+\begin_layout Chunk
+p + ylab("Highway mpg") 
+\end_layout
+
+\begin_layout Chunk
+p + labs(x = "City mpg", y = "Highway", colour = "Displacement") 
+\end_layout
+
+\begin_layout Chunk
+p + xlab(expression(frac(miles, gallon)))
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Standard
+Breaks controls which values appear on the axis or legend, i.e., what values
+ tick marks should appear on an axis or how a continuous scale is segmented
+ in a legend.
+ labels specifies the labels that should appear at the breakpoints.
+ If labels is set, you must also specify breaks, so that the two can be
+ matched up correctly.
+ To distinguish breaks from limits, remember that breaks affect what appears
+ on the axes and legends, while limits affect what appears on the plot.
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+p <- qplot(cyl, wt, data = mtcars) 
+\end_layout
+
+\begin_layout Chunk
+p + scale_x_continuous(breaks = c(5.5, 6.5)) 
+\end_layout
+
+\begin_layout Chunk
+p + scale_x_continuous(limits = c(5.5, 6.5)) 
+\end_layout
+
+\begin_layout Chunk
+p <- qplot(wt, cyl, data = mtcars, colour = cyl) 
+\end_layout
+
+\begin_layout Chunk
+p + scale_colour_gradient(breaks = c(5.5, 6.5)) 
+\end_layout
+
+\begin_layout Chunk
+p + scale_colour_gradient(limits = c(5.5, 6.5))
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Facet
+\end_layout
+
+\begin_layout Standard
+There are two types of faceting provided by ggplot2: 
+\family typewriter
+facet_grid
+\family default
+ and 
+\family typewriter
+facet_wrap
+\family default
+.
+ Facet grid produces a 2d grid of panels defined by variables which form
+ the rows and columns, while facet wrap produces a 1d ribbon of panels that
+ is wrapped into 2d.
+\end_layout
+
+\begin_layout Standard
+You can access either faceting system from qplot().
+ A 2d faceting specification (e.g., x ~ y) will use facet_grid, while a 1d
+ specification (e.g., ~ x) will use facet_wrap.
+ For facet_grid there is an additional parameter called space, which takes
+ values "free" or "fixed".
+ When the space can vary freely, each column (or row) will have width (or
+ height) proportional to the range of the scale for that column (or row).
+ This makes the scaling equal across the whole plot.
+
+\family typewriter
+ facet_grid(manufacturer ~ ., scales = "free", space = "free") 
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+mpg2 <- subset(mpg, cyl != 5 & drv %in% c("4", "f")) 
+\end_layout
+
+\begin_layout Chunk
+qplot(cty, hwy, data = mpg2) + facet_grid(.
+ ~ cyl) #a single row with multiple column 
+\end_layout
+
+\begin_layout Chunk
+qplot(cty, data = mpg2, geom="histogram") + facet_grid(cyl ~ .) #a single
+ col with multiple row 
+\end_layout
+
+\begin_layout Chunk
+#facet_grid(variable ~ ., scales = "free_y")
+\end_layout
+
+\begin_layout Chunk
+qplot(cty, hwy, data = mpg2) + facet_grid(drv ~ cyl) #multiple rows and
+ cols 
+\end_layout
+
+\begin_layout Chunk
+p <- qplot(displ, hwy, data = mpg2) +  geom_smooth(method = "lm", se = F)
+ 
+\end_layout
+
+\begin_layout Chunk
+p + facet_grid(cyl ~ drv) 
+\end_layout
+
+\begin_layout Chunk
+p + facet_grid(cyl ~ drv, margins = T) #Margin like contingency table
+\end_layout
+
+\begin_layout Chunk
+qplot(displ, hwy, data = mpg2) + geom_smooth(aes(colour = drv), method =
+ "lm", se = F) + facet_grid(cyl ~ drv, margins = T)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsubsection
+Group VS facet
+\end_layout
+
+\begin_layout Chunk
+<<eval=TRUE,out.width='0.4
+\backslash
+
+\backslash
+textwidth',fig.show='hold'>>=
+\end_layout
+
+\begin_layout Chunk
+dplot <- ggplot(diamonds, aes(carat, price, colour = color)) 
+\end_layout
+
+\begin_layout Chunk
+dplot+geom_point() 
+\end_layout
+
+\begin_layout Chunk
+dplot + geom_point() + facet_grid(.
+ ~ color) 
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Chunk
+
+\end_layout
+
+\begin_layout Subsubsection
+Dodging vs.
+ faceting
+\end_layout
+
+\begin_layout Chunk
+<<eval=TRUE,out.width='0.4
+\backslash
+
+\backslash
+textwidth',fig.show='hold'>>=
+\end_layout
+
+\begin_layout Chunk
+qplot(color, data=diamonds, geom = "bar", fill = cut, position="dodge")
+ 
+\end_layout
+
+\begin_layout Chunk
+qplot(cut, data = diamonds, geom = "bar", fill = cut) + facet_grid(.
+ ~ color) +theme(axis.text.x = element_text(angle = 90, hjust = 1, size =
+ 8,colour = "grey50")) 
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Legend
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+##change default point color for discrete variables.
+\end_layout
+
+\begin_layout Chunk
+cbPalette <- c("blue", "red") 
+\end_layout
+
+\begin_layout Chunk
+p+geom_point(data=data,aes(long,lat,colour=type,shape=type))+theme_bw()
+\end_layout
+
+\begin_layout Chunk
++theme(legend.position="top")+scale_colour_manual(values=cbPalette) 
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+Theme
+\end_layout
+
+\begin_layout Chunk
+<<>>=
+\end_layout
+
+\begin_layout Chunk
+ggplot()+theme_bw()
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\begin_layout Subsection
+plyr package
+\end_layout
+
+\begin_layout Chunk
+<<eval=T>>=
+\end_layout
+
+\begin_layout Chunk
+library(plyr) 
+\end_layout
+
+\begin_layout Chunk
+head(ddply(diamonds, .(color), subset, carat == min(carat))) #subset to select
+ data 
+\end_layout
+
+\begin_layout Chunk
+head(ddply(diamonds, .(color), transform, price = scale(price))) #transform
+ to change 
+\end_layout
+
+\begin_layout Chunk
+head(ddply(diamonds, .(color), transform, price = price - mean(price))) 
+\end_layout
+
+\begin_layout Chunk
+#colwise() returns a new function 
+\end_layout
+
+\begin_layout Chunk
+nmissing <- function(x) sum(is.na(x)) 
+\end_layout
+
+\begin_layout Chunk
+nmissing(msleep$brainwt) 
+\end_layout
+
+\begin_layout Chunk
+nmissing_df <- colwise(nmissing) 
+\end_layout
+
+\begin_layout Chunk
+nmissing_df(msleep) 
+\end_layout
+
+\begin_layout Chunk
+colwise(nmissing)(msleep) # a shortcut 
+\end_layout
+
+\begin_layout Chunk
+#numcolwise().
+ catcolwise() only works with categorical columns 
+\end_layout
+
+\begin_layout Chunk
+ddply(msleep, .(vore), numcolwise(median), na.rm = T) 
+\end_layout
+
+\begin_layout Chunk
+my_summary <- function(df) {with(df, data.frame(pc_cor = cor(price, carat,
+ method = "spearman"), lpc_cor = cor(log(price), log(carat))))} 
+\end_layout
+
+\begin_layout Chunk
+ddply(diamonds, .(cut), my_summary)
+\end_layout
+
+\begin_layout Chunk
+@
+\end_layout
+
+\end_body
+\end_document

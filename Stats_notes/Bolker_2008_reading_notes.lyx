@@ -1,0 +1,6360 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\begin_preamble
+\graphicspath{{figs/}}
+%\usepackage{floatrow} % all floats center automatically
+\end_preamble
+\use_default_options true
+\begin_modules
+knitr
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman palatino
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family rmdefault
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command bibtex
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 0
+\use_package mhchem 1
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plainnat
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+setup, include=FALSE, cache=FALSE
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+opts_chunk$set(fig.align='center',cache=TRUE,tidy=TRUE,eval=F,out.width='0.8
+\backslash
+
+\backslash
+textwidth') 
+\end_layout
+
+\begin_layout Plain Layout
+
+options(replace.assign = TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+Reading notes of 
+\emph on
+Ecological Models and Data in R
+\end_layout
+
+\begin_layout Author
+Daijiang Li
+\end_layout
+
+\begin_layout Chapter
+Introduction
+\end_layout
+
+\begin_layout Section
+Frameworks for statistical inference
+\end_layout
+
+\begin_layout Subsection
+Classical frequentist
+\end_layout
+
+\begin_layout Standard
+Classical statistics, which are part of the broader frequentist paradigm,
+ are the kind of statistics typically presented in introductory statistics
+ classes.
+ For a specific experimental procedure (such as drawing cards or flipping
+ coins), you calculate the probability of a particular outcome, which is
+ defined as 
+\emph on
+the long-run average frequency of that outcome in a sequence of repeated
+ experiments
+\emph default
+.
+ Next you calculate a p-value, defined as the probability of that outcome
+ or any more extreme outcome given a specified null hypothesis.
+ If this so-called tail probability is small, then you reject the null hypothesi
+s: otherwise, you fail to reject it.
+ But you don’t accept the alternative hypothesis if the tail probability
+ is large, you just fail to reject the null hypothesis.
+\end_layout
+
+\begin_layout Standard
+A frequentist would translate this biological question into statistics as
+ “what is the probability that I would observe a result this extreme, or
+ more extreme, given the sampling procedure?”
+\end_layout
+
+\begin_layout Standard
+Working statisticians will tell you that it is better to focus on estimating
+ the values of biologically meaningful parameters and finding their confidence
+ limits rather than worrying too much about whether p is greater or less
+ than 0.05 (Yoccoz, 1991; Johnson, 1999; Osenberg et al., 2002) — although
+ Stephens et al.
+ (2005) remind us that hypothesis testing can still be useful.
+\end_layout
+
+\begin_layout Subsection
+Likelihood
+\end_layout
+
+\begin_layout Standard
+Most modern statistics uses an approach called maximum likelihood estimation,
+ or approximations to it.
+ For a particular statistical model, maximum likelihood finds the set of
+ parameters (e.g.
+ seed removal rates) that makes the observed data (e.g.
+ the particular outcomes of predation trials) most likely to have occurred.
+ Based on a model for both the deterministic and stochastic aspects of the
+ data, we can compute the likelihood (the probability of the observed outcome)
+ given a particular choice of parameters.
+ We then find the set of parameters that makes the likelihood as large as
+ possible, and take the resulting maximum likelihood estimates (MLEs) as
+ our best guess at the parameters.
+ For mathematical convenience, we often work with the logarithm of the likelihoo
+d (the log-likelihood ) instead of the likelihood; the parameters that give
+ the maximum log-likelihood also give the maximum likelihood.
+\end_layout
+
+\begin_layout Standard
+However, most modelers add a frequentist interpretation to likelihoods,
+ using a mathematical proof that says that, across the hypothetical repeated
+ trials of the frequentist approach, the distribution of the negative logarithm
+ of the likelihood itself follows a 
+\begin_inset Formula $\chi^{2}$
+\end_inset
+
+ (“chi-squared”) distribution.
+\end_layout
+
+\begin_layout Standard
+Likelihood and classical frequentist analysis share the same philosophical
+ underpinnings.
+ Likelihood analysis is really a particular flavor of frequentist analysis,
+ one that focuses on writing down a likelihood model and then testing for
+ significant differences in the likelihood ratio rather than applying frequentis
+t statistics directly to the observed outcomes.
+ Classical analyses are usually easier because they are built into common
+ statistics packages, and they may make fewer assumptions than likelihood
+ analyses (for example, Fisher’s test is exact while the LRT is only valid
+ for large data sets), but likelihood analyses are often better matched
+ with ecological questions.
+\end_layout
+
+\begin_layout Subsection
+Bayesian
+\end_layout
+
+\begin_layout Standard
+Frequentist statistics assumes that there is a “true” state of the world
+ (e.g.
+ the difference between species in predation probability) which gives rise
+ to a distribution of possible experimental outcomes.
+ The Bayesian framework says instead that the experimental outcome — what
+ we actually saw happen — is the truth, while the parameter values or hypotheses
+ have probability distributions.
+ The Bayesian framework solves many of the conceptual problems of frequentist
+ statistics: answers depend on what we actually saw and not on a range of
+ hypothetical outcomes, and we can legitimately make statements about the
+ probability of different hypotheses or parameter values.
+\end_layout
+
+\begin_layout Standard
+Frequentists, who believe that the true value is a fixed number and uncertainty
+ lies in what you observe [or might have observed], and Bayesians, who believe
+ that observations are fixed numbers and the true values are uncertain.
+\end_layout
+
+\begin_layout Chapter
+Explorayory data analysis and graphics
+\end_layout
+
+\begin_layout Chapter
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+Deterministic functions
+\end_layout
+
+\end_inset
+
+Deterministic functions for ecological modeling
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+What functions could fit this pattern? What do their parameters mean in
+ terms of the shapes of the curves? In terms of ecology? How do we “eyeball”
+ the data to obtain approximate parameter values, which we will need as
+ a starting point for more precise estimation and as a check on our results?
+\end_layout
+
+\begin_layout Standard
+The Ricker
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Ricker function
+\end_layout
+
+\end_inset
+
+ function, 
+\begin_inset Formula $y=axe^{−bx}$
+\end_inset
+
+ , is a standard choice for hump-shaped ecological patterns that are skewed
+ to the right.
+\end_layout
+
+\begin_layout Section
+Finding out about functions numerically
+\end_layout
+
+\begin_layout Standard
+Calculating and plotting curves in R.
+\end_layout
+
+\begin_layout Standard
+
+\lang american
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\lang american
+Useful non-linear functions
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Tabular
+<lyxtabular version="3" rows="24" columns="3">
+<features rotate="0" tabularvalignment="middle" tabularwidth="100text%">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Equation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Asymptotic functions
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Michaelis-Menten
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=\frac{ax}{1+bx}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+2-parameter asymptotic exponential
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=a(1-e^{-bx})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+3-parameter asymptotic exponential
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=a-be^{-cx}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+S-shaped functions
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+logistic 2-parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=\frac{e^{a+bx}}{1+e^{a+bx}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+logistic 3-parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=\frac{a}{1+be^{-cx}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+logistic 4-parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=a+\frac{b-a}{1+e^{(c-x)/d}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Weibull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=a-be^{-(cx^{d})}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Gompertz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=ae^{-be^{-cx}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Humped curves
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Ricker curve
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=axe^{-bx}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+First-order compartment
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=ke^{(-e_{a}x-e^{-e_{b}x})}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Bell-shaped
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=ae^{-\mid bx\mid^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+Biexponential
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=ae^{bx}-ce^{-dx}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Other functions
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Negative exponential
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=ae^{-bx}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Polynomial functions
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $y=\sum_{i=0}^{n}a_{i}x^{i}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Rational functions:polynomials in fractions
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $y=(\sum a_{i}x^{i})/(\sum b_{j}x^{j})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hyperbolic
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $y=a/x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Michaelis-Menten (Holling type II)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\lang american
+\begin_inset Formula $y=\frac{ax}{b+x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Holling type III
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $y=\frac{ax^{2}}{b^{2}+x^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Holling type IV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $y=\frac{ax^{2}}{b+cx+x^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Finding out about functions analytically
+\end_layout
+
+\begin_layout Subsection
+Taking limits: what happens at either end?
+\end_layout
+
+\begin_layout Standard
+Terms with larger powers of 
+\begin_inset Formula $x$
+\end_inset
+
+ will dwarf smaller powers, and exponentials will dwarf any power.
+ Exponentials are stronger than powers: 
+\begin_inset Formula $x^{−n}e^{x}$
+\end_inset
+
+ eventually gets big and 
+\begin_inset Formula $x^{n}e^{−x}$
+\end_inset
+
+ eventually gets small as 
+\begin_inset Formula $x$
+\end_inset
+
+ increases, no matter how big 
+\begin_inset Formula $n$
+\end_inset
+
+ is (exponentials always win).
+ For more difficult functions that contain a fraction whose numerator and
+ denominator both approach zero or infinity in some limit (and thus make
+ it hard to find the limiting value), you can try L’Hopital’s Rule: 
+\begin_inset Formula $\lim\frac{a(x)}{b(x)}=\lim\frac{a'(x)}{b'(x)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Taylor series approximation
+\end_layout
+
+\begin_layout Standard
+The Taylor series or Taylor approximation is the single most useful, and
+ used, application of calculus for an ecologist.
+ Two particularly useful applications of Taylor approximation are understanding
+ the shapes of goodnessof-fit surfaces (Chapter 6) and the delta method
+ for estimating errors in estimation (Chapter 7).
+ The Taylor series allows us to approximate a complicated function near
+ a point we care about, using a simple function — a polynomial with a few
+ terms, say a line or a quadratic curve.
+ In practice ecologists never go beyond a quadratic expansion.
+ 
+\begin_inset Formula 
+\[
+f(x)\thickapprox f(x_{0})+f'(x_{0})\cdot(x-x_{0})+f''(x_{0})\cdot\frac{(x-x_{0})^{2}}{2}+\cdots+f^{n}(x_{0})\cdot\frac{(x-x_{0})^{n}}{n!}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Taylor expansion of the exponential, 
+\begin_inset Formula $e^{rx}$
+\end_inset
+
+ , around 
+\begin_inset Formula $x=0$
+\end_inset
+
+ is 
+\begin_inset Formula $1+rx+(rx)^{2}/2+(rx)^{3}/(2·3)...$
+\end_inset
+
+.
+ Remembering this fact rather than working it out every time may save you
+ time in the long run — for example, to understand how the Ricker function
+ works for small 
+\begin_inset Formula $x$
+\end_inset
+
+ we can substitute 
+\begin_inset Formula $(1−bx)$
+\end_inset
+
+ for 
+\begin_inset Formula $e^{−bx}$
+\end_inset
+
+ (dropping all but the first two terms!) to get 
+\begin_inset Formula $y\thickapprox ax-abx^{2}$
+\end_inset
+
+ : this tells us immediately that the function starts out linear, but starts
+ to curve downward right away.
+\end_layout
+
+\begin_layout Standard
+Calculating Taylor approximations is often tedious (all those derivatives),
+ but we usually try to do it at some special point where a lot of the complexity
+ goes away (such as 
+\begin_inset Formula $x=0$
+\end_inset
+
+ for a logistic curve).
+\end_layout
+
+\begin_layout Chapter
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+Probability
+\end_layout
+
+\end_inset
+
+Probability and Stochastic Distributions for Ecological Modeling
+\end_layout
+
+\begin_layout Standard
+Probability density function: A probability distribution over a continuous
+ range (such as all real numbers, or the non-negative real numbers) is called
+ a 
+\emph on
+continuous
+\emph default
+ distribution.
+ The 
+\series bold
+\emph on
+cumulative distribution function
+\series default
+\emph default
+ of a continuous distribution (
+\begin_inset Formula $F(x)=Prob(X\leq x)$
+\end_inset
+
+ is easy to define and understand — it’s just the probability that the continuou
+s random variable 
+\begin_inset Formula $X$
+\end_inset
+
+ is smaller than a particular value 
+\begin_inset Formula $x$
+\end_inset
+
+ in any given observation or experiment — but the 
+\series bold
+\emph on
+probability density function
+\series default
+\emph default
+ (the analogue of the distribution function for a discrete distribution)
+ is more confusing, since the probability of any precise value is zero.
+ You may imagine that a measurement of (say) pH is exactly 7.9, but in fact
+ what you have observed is that the pH is between 7.82 and 7.98 — if your
+ meter has a precision of ± 1%.
+ Thus continuous probability distributions are expressed as probability
+ densities rather than probabilities — the probability that random variable
+ X is between x and x + ∆x, divided by ∆x (Prob(7.82 < X < 7.98)/0.16, in this
+ case).
+ Dividing by ∆x allows the observed probability density to have a well-defined
+ limit as precision increases and ∆x shrinks to zero.
+ Unlike probabilities, Probability densities can be larger than 1 (Figure
+ 4.5).
+ For example, if the pH probability distribution is uniform on the interval
+ [7,7.1] but zero everywhere else, its probability density is 10.
+ In practice, we will mostly be concerned with relative probabilities or
+ likelihoods, and so the maximum density values and whether they are greater
+ than or less than 1 won’t matter much.
+\end_layout
+
+\begin_layout Standard
+In probability theory, a 
+\series bold
+\emph on
+probability density function (pdf)
+\series default
+\emph default
+, or density of a 
+\emph on
+continuous random variable
+\emph default
+, is a function that describes the
+\emph on
+ relative likelihood
+\emph default
+ for this random variable to take on a given value.
+ The probability of the random variable falling within a particular range
+ of values is given by the integral of this variable’s density over that
+ range—that is, it is given by the area under the density function but above
+ the horizontal axis and between the lowest and greatest values of the range.
+ The probability density function is nonnegative everywhere, and its integral
+ over the entire space is equal to one.
+\end_layout
+
+\begin_layout Standard
+A 
+\series bold
+\emph on
+probability density function
+\series default
+\emph default
+ is most commonly associated with absolutely continuous univariate distributions.
+ A random variable 
+\begin_inset Formula $X$
+\end_inset
+
+ has 
+\series bold
+\emph on
+density
+\series default
+\emph default
+ 
+\begin_inset Formula $f_{X}$
+\end_inset
+
+, where 
+\begin_inset Formula $f_{X}$
+\end_inset
+
+ is a non-negative 
+\emph on
+Lebesgue-integrable
+\emph default
+ function, if:
+\begin_inset Formula 
+\[
+Pr[a\leq X\leq b]=\int_{a}^{b}f_{X}(x)dx
+\]
+
+\end_inset
+
+Hence, if 
+\begin_inset Formula $F_{X}$
+\end_inset
+
+ is the 
+\series bold
+\emph on
+cumulative distribution function
+\series default
+\emph default
+ of 
+\begin_inset Formula $X$
+\end_inset
+
+, then:
+\begin_inset Formula 
+\[
+F_{X}(x)=\int_{-\infty}^{x}f_{X}(\mu)d\mu
+\]
+
+\end_inset
+
+and (if 
+\begin_inset Formula $f_{X}$
+\end_inset
+
+ is continuous at 
+\begin_inset Formula $x$
+\end_inset
+
+)
+\begin_inset Formula 
+\[
+f_{X}(x)=\frac{d}{dx}F_{X}(x)
+\]
+
+\end_inset
+
+Intuitively, one can think of 
+\begin_inset Formula $f_{X}(x)dx$
+\end_inset
+
+ as being the probability of 
+\begin_inset Formula $X$
+\end_inset
+
+ falling within the infinitesimal interval 
+\begin_inset Formula $[x,\:x+dx]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Definition.
+
+\series default
+ Let 
+\begin_inset Formula $X$
+\end_inset
+
+ be a discrete random variable.
+ Then for 
+\begin_inset Formula $x\in\mathbb{R}$
+\end_inset
+
+, the function 
+\begin_inset Formula $p_{X}(x)=P\{X=x\}$
+\end_inset
+
+ is called the 
+\emph on
+probability mass function
+\emph default
+ of 
+\begin_inset Formula $X$
+\end_inset
+
+ .
+ By the axioms of probability, a probability mass function 
+\begin_inset Formula $p_{X}$
+\end_inset
+
+ satises 
+\begin_inset Formula $P\{X\in A\}=\sum_{x\in A}p_{X}(x)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Definition
+\series default
+.
+ Let 
+\begin_inset Formula $X$
+\end_inset
+
+ be a continuous random variable with distribution function 
+\begin_inset Formula $F(t)=P\{X\leq t\}$
+\end_inset
+
+.
+ Suppose that there exists a nonnegative, integrable function 
+\begin_inset Formula $f:\mathbb{R}\rightarrow[0,\infty)$
+\end_inset
+
+, or sometimes 
+\begin_inset Formula $f_{X}$
+\end_inset
+
+ , such that
+\begin_inset Formula 
+\[
+F(x)=\int_{-\infty}^{x}f(y)dy
+\]
+
+\end_inset
+
+Then the function 
+\begin_inset Formula $f$
+\end_inset
+
+ is called the 
+\emph on
+probability density function
+\emph default
+ of 
+\begin_inset Formula $X$
+\end_inset
+
+ .
+ We now have that for any 
+\begin_inset Formula $A\subset\mathbb{R}$
+\end_inset
+
+ (or, more precisely, for any 
+\begin_inset Formula $A\in\digamma$
+\end_inset
+
+ ),
+\begin_inset Formula 
+\[
+P\{X\in A\}=\int_{A}f_{X}(x)dx
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Bestiary of Distributions
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways true
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Summary of probability distributions I.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="7">
+<features rotate="0" tabularvalignment="middle" tabularwidth="100text%">
+<column alignment="center" valignment="top" width="7text%">
+<column alignment="center" valignment="top" width="18text%">
+<column alignment="right" valignment="top" width="25text%">
+<column alignment="center" valignment="top" width="8text%">
+<column alignment="center" valignment="top" width="12text%">
+<column alignment="center" valignment="top" width="11text%">
+<column alignment="center" valignment="top" width="8text%">
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+distribution
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mean 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+variance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+conjugate prior
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Binomial
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\left(_{x}^{N}\right)p^{x}(1-p)^{N-x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+ [real, 0-1], prob of success, 
+\begin_inset Formula $N$
+\end_inset
+
+ [positive integer], number of trials
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Np$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Np(1-p)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{(1-p)/(Np)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Beta
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Poisson
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{e^{-\lambda}\lambda^{n}}{n!}$
+\end_inset
+
+ or 
+\begin_inset Formula $\frac{e^{-rt}(rt)^{n}}{n!}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda$
+\end_inset
+
+ (real, positive) expected number per sample, or 
+\begin_inset Formula $r$
+\end_inset
+
+, expected # per unit effort, area, time, etc.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1/\sqrt{\lambda}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gamma
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Negative binomial
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{(n+x-1)!}{(n-1)!x!}p^{n}(1-p)^{x}$
+\end_inset
+
+ or 
+\begin_inset Formula $\frac{\Gamma(k+x)}{\Gamma(k)x!}(\frac{k}{k+\mu})^{k}(\frac{\mu}{k+\mu})^{x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+ probability per trial and 
+\begin_inset Formula $n$
+\end_inset
+
+ # of successes awaited; OR 
+\begin_inset Formula $\mu$
+\end_inset
+
+ expected # of counts and 
+\begin_inset Formula $k$
+\end_inset
+
+ overdispersion parameter (shape parameter of underlying heterogeneity)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mu$
+\end_inset
+
+; 
+\begin_inset Formula $nq/p$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mu+\frac{\mu^{2}}{k}$
+\end_inset
+
+;
+\begin_inset Formula $nq/p^{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{(1+\mu/k)/\mu}$
+\end_inset
+
+; 
+\begin_inset Formula $1/\sqrt{nq}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+No simple
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Geometric
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p(1-p)^{x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p$
+\end_inset
+
+ probability of success
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1-p}{p}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1-p}{p^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1/\sqrt{1/(1-p)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Beta Binomial
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size small
+\begin_inset Formula $\frac{\Gamma(\theta)}{\Gamma(p\theta)\Gamma(q\theta)}\frac{N!}{x!(N-x)!}\frac{\Gamma(x+p\theta)\Gamma(N-x+q\theta)}{\Gamma(N+\theta)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p,\theta$
+\end_inset
+
+ overdispersion parameter.
+ Or a=
+\begin_inset Formula $\theta p$
+\end_inset
+
+ and b=
+\begin_inset Formula $\theta q$
+\end_inset
+
+ shape parameters of Beta distribution.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Np$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Npq(1+\frac{N-1}{\theta+1})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{\frac{q}{Np}(1+\frac{N-1}{\theta+1})}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uniform
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{\ensuremath{1}}{b-a}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $a,b$
+\end_inset
+
+ min and max
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{\ensuremath{a+b}}{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{(b-a)^{2}}{12}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{b-a}{(a+b)\sqrt{3}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Normal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{\sqrt{2\pi\sigma}}\exp(-\frac{(x-\mu)^{2}}{2\sigma^{2}})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mu,\sigma$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mu$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{\sigma}{\mu}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Normal(
+\begin_inset Formula $\mu$
+\end_inset
+
+); Gamma(
+\begin_inset Formula $\frac{1}{\sigma^{2}}$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gamma
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{s^{a}\Gamma(a)}x^{a-1}e^{-x/s}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $a>0$
+\end_inset
+
+ shape: # of events; 
+\begin_inset Formula $s=\frac{mean}{a}>0$
+\end_inset
+
+ scale: length per event or 
+\begin_inset Formula $r$
+\end_inset
+
+ rate
+\begin_inset Formula $=1/s$
+\end_inset
+
+ rate at which events occur.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $as$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $as^{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{\sqrt{a}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Exponential
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda e^{-\lambda x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lambda>0$
+\end_inset
+
+ rate: death or disappearance rate
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{\lambda}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{1}{\lambda^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Beta
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}x^{a-1}(1-x)^{b-1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $a>0$
+\end_inset
+
+ shape1: # of successes
+\begin_inset Formula $+1$
+\end_inset
+
+; 
+\begin_inset Formula $b>0$
+\end_inset
+
+ shape2: # of failures 
+\begin_inset Formula $+1$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{a}{a+b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\frac{ab}{(a+b)^{2}(a+b+1)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{\frac{b/a}{a+b+1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lognormal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size small
+\begin_inset Formula $\frac{1}{x\sigma\sqrt{2\pi}}\exp(-\frac{(log(x)-\mu)^{2}}{2\sigma^{2}})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="right" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\mu,\sigma$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $e^{(\mu+\frac{\sigma^{2}}{2})}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $e^{(2\mu+\sigma^{2})}(e^{\sigma^{2}}-1)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{e^{\sigma^{2}}-1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Summary of probability distributions II.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align left
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="5">
+<features rotate="0" tabularvalignment="middle" tabularwidth="100text%">
+<column alignment="left" valignment="middle" width="10text%">
+<column alignment="left" valignment="top" width="10text%">
+<column alignment="left" valignment="top" width="12text%">
+<column alignment="left" valignment="top" width="10text%">
+<column alignment="left" valignment="top" width="50text%">
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+range
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Skew
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Examples
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Binomial
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Discrete
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $0\leq x\leq N$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+# of surviving individuals out of an initial sample; # of infested/infected
+ animals, fruits, etc.
+ in a sample; # of a particular class (haplotype, subspecies, etc.) in a
+ larger population.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Poisson
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Discrete
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x\geq0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+none
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+# of seeds/seedlings falling in a gap; # of offsprings produced in a season;
+ # of prey caught per unit time.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Negative binomial
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Discrete
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x\geq0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+essentially the same as the Poisson distribution, but allowing for heterogeneity.
+ 
+\emph on
+Numerically it is really a compunded Poisson-Gamma distribution
+\emph default
+.
+ # of individuals per patch; # of seedlings in a gap or per unit area.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Geometric (memoryless)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Discrete
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x\geq0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+# of successful/survived breeding seasons for a seasonally reproducing organism.
+ Lifespans measured in discrete units.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Beta Binomial
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Discrete
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $0\leq x\leq N$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+as for the Binomial
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uniform
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Continuous
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $a\leq x\leq b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+none
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+frequently used as a building block for other distributions.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Normal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Continuous
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-\infty,\infty$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+none
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+many continuous symmetrically distributed measurements -- temperature, pH,
+ nitrogen concentration.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gamma
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Continuous
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x>0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+almost any environmental variable with a large variance where negative values
+ don’t make sense: nitrogen concentrations, light intensity, growth rates
+ etc..
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Exponential (memoryless)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Continuous
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x>0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+times between events (bird sightings, rainfall, etc.); lifespans/survival
+ times; random samples of anything that decreases exponentially (e.g.
+ light levels in a forest canopy).
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Beta
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Continuous
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $0\leq x\leq1$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+good for modeling probabilities or proportions; modeling continuous distribution
+s with peaks at both ends; define a continuous distribution on a finite
+ range.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lognormal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Continuous
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x>0$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sizes or masses of individuals, especially rapidly growing individuals;
+ abundance vs.
+ frequency curves for plant communities.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted12.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Relationships among probability distributions.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discrete models
+\end_layout
+
+\begin_layout Subsubsection
+Binomial
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $f(x)=\left(_{x}^{N}\right)p^{x}(1-p)^{N-x}$
+\end_inset
+
+, mean
+\begin_inset Formula $=Np$
+\end_inset
+
+, variance 
+\begin_inset Formula $=Np(1-p)$
+\end_inset
+
+, depends on the number of samples per trail 
+\begin_inset Formula $N$
+\end_inset
+
+.
+ 
+\begin_inset Formula $N$
+\end_inset
+
+ increases, variance increases but the coefficient of variation (cv) 
+\begin_inset Formula $\sqrt{Np(1-p)}/(Np)=\sqrt{(1-p)/(Np)}$
+\end_inset
+
+ decreases.
+\end_layout
+
+\begin_layout Standard
+You should only use the binomial in fitting data when there is an upper
+ limit to the number of possible successes.
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $N$
+\end_inset
+
+ is large and 
+\begin_inset Formula $p$
+\end_inset
+
+ isn’t too close to 0 or 1 (i.e.
+ when 
+\begin_inset Formula $Np$
+\end_inset
+
+ is large, typically 
+\begin_inset Formula $Np\geq10,\,Nq\geq10$
+\end_inset
+
+), then the binomial distribution is approximately 
+\series bold
+normal
+\series default
+.
+ When 
+\begin_inset Formula $N$
+\end_inset
+
+ is large and 
+\begin_inset Formula $p$
+\end_inset
+
+ is small, so that the probability of getting 
+\begin_inset Formula $N$
+\end_inset
+
+ successes is small, the binomial approaches the 
+\series bold
+Poisson
+\series default
+ distribution.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted3.png
+	width 80text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Binomial distribution.
+ 
+\begin_inset Formula $N=10$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Poisson
+\end_layout
+
+\begin_layout Standard
+The Poisson distribution gives the distribution of the number of individuals,
+ arrivals, events, counts, etc., in a given time/space/unit of counting effort
+ if each event is independent of all the others.
+ The most common definition of the Poisson has only one parameter, the average
+ density or arrival rate, 
+\begin_inset Formula $λ$
+\end_inset
+
+, 
+\emph on
+which equals the expected number of counts in a sampling unit
+\emph default
+.
+ An alternative parameterization gives a density per unit sampling effort
+ and then specifies the mean as the product of the density per sampling
+ effort 
+\begin_inset Formula $r$
+\end_inset
+
+ times the sampling effort 
+\begin_inset Formula $t$
+\end_inset
+
+, 
+\begin_inset Formula $λ=rt$
+\end_inset
+
+.
+ This parameterization emphasizes that even when the population density
+ is constant, you can change the Poisson distribution of counts by sampling
+ more extensively — for longer times or over larger quadrats.
+\end_layout
+
+\begin_layout Standard
+The Poisson distribution has no upper limit, although values much larger
+ than the mean value are highly improbable.
+ This characteristic provides 
+\emph on
+a rule for choosing between the binomial and Poisson
+\emph default
+.
+ If you expect to observe a “ceiling” on the number of counts, you should
+ use the binomial; if you expect the number of counts to be effectively
+ unlimited, even if it is theoretically bounded (e.g.
+ there can’t really be an infinite number of plants in your sampling quadrat),
+ use the Poisson.
+\end_layout
+
+\begin_layout Standard
+The Poisson distribution 
+\emph on
+only makes sense for count data
+\emph default
+.
+ For 
+\begin_inset Formula $λ<1$
+\end_inset
+
+ the Poisson’s mode is at zero.
+ When the expected number of counts gets large (e.g.
+ 
+\begin_inset Formula $λ>10$
+\end_inset
+
+) the Poisson becomes approximately normal.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted4.png
+	width 80text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Poisson distribution.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Negative binomial
+\end_layout
+
+\begin_layout Standard
+Most probability books derive the negative binomial distribution from a
+ series of independent binary (heads/tails, black/white, male/female, yes/no)
+ trials that all have the same probability of success, like the binomial
+ distribution.
+ Rather than count the number of successes obtained in a fixed number of
+ trials, which would result in a binomial distribution, the negative binomial
+ counts 
+\series bold
+\emph on
+the number of failures
+\series default
+\emph default
+ before a predetermined number of successes occurs.
+\end_layout
+
+\begin_layout Standard
+This failure-process parameterization is only occasionally useful in ecological
+ modeling.
+ Ecologists use the negative binomial because it is discrete, like the Poisson,
+ 
+\emph on
+but its variance can be larger than its mean
+\emph default
+ (i.e.
+ it can be 
+\emph on
+overdispersed
+\emph default
+).
+ 
+\series bold
+\emph on
+Thus, it’s a good phenomenological description of a patchy or clustered
+ distribution with no intrinsic upper limit that has more variance than
+ the Poisson
+\series default
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+The “ecological” parameterization of the negative binomial replaces the
+ parameters 
+\begin_inset Formula $p$
+\end_inset
+
+ (probability of success per trial: 
+\family typewriter
+prob
+\family default
+ in R) and 
+\begin_inset Formula $n$
+\end_inset
+
+ (number of successes before you stop counting failures: 
+\family typewriter
+size
+\family default
+ in R) with 
+\begin_inset Formula $µ=n(1−p)/p$
+\end_inset
+
+, the mean number of failures expected (or of counts in a sample: 
+\family typewriter
+mu
+\family default
+ in R), and 
+\begin_inset Formula $k$
+\end_inset
+
+, which is typically called an 
+\emph on
+overdispersion parameter
+\emph default
+.
+ (i.e.
+ 
+\begin_inset Formula $p\rightarrow\mu,\:n\rightarrow k$
+\end_inset
+
+).
+ Confusingly, 
+\begin_inset Formula $k$
+\end_inset
+
+ is also called 
+\family typewriter
+size
+\family default
+ in R, because it is mathematically equivalent to 
+\begin_inset Formula $n$
+\end_inset
+
+ in the failure-process parameterization.
+\end_layout
+
+\begin_layout Standard
+The overdispersion parameter measures the amount of clustering, or aggregation,
+ or heterogeneity, in the data: 
+\emph on
+a smaller 
+\begin_inset Formula $k$
+\end_inset
+
+ means more heterogeneity
+\emph default
+.
+ The variance of the negative binomial distribution is 
+\begin_inset Formula $\mu+\mu^{2}/k$
+\end_inset
+
+, and 
+\emph on
+so as 
+\begin_inset Formula $k$
+\end_inset
+
+ becomes large the variance approaches the mean and the distribution approaches
+ the Poisson distribution.
+
+\emph default
+ For 
+\begin_inset Formula $k>10$
+\end_inset
+
+, the negative binomial is hard to tell from a Poisson distribution, but
+ 
+\begin_inset Formula $k$
+\end_inset
+
+ is often less than 1 in ecological applications.
+\end_layout
+
+\begin_layout Standard
+Specifically, you can get a negative binomial distribution as the result
+ of a Poisson sampling process where the rate 
+\begin_inset Formula $λ$
+\end_inset
+
+ itself varies.
+ If the distribution of 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is a gamma distribution with shape parameter 
+\begin_inset Formula $k$
+\end_inset
+
+ and mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+, and 
+\begin_inset Formula $x$
+\end_inset
+
+ is Poisson-distributed with mean 
+\begin_inset Formula $\lambda$
+\end_inset
+
+, then the distribution of 
+\begin_inset Formula $x$
+\end_inset
+
+ be a negative binomial distribution with mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and overdispersion parameter 
+\begin_inset Formula $k$
+\end_inset
+
+ (May, 1978; Hilborn and Mangel, 1997).
+ In this case, the negative binomial reflects unmeasured (“random”) variability
+ in the population.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+lambda <- rgamma(1000, shape = k, scale = mu/k) # scale=mean/shape
+\end_layout
+
+\begin_layout Plain Layout
+
+z <- rpois(1000, lambda)
+\end_layout
+
+\begin_layout Plain Layout
+
+p2=dnbinom(0:max(z), mu = mu, size = k)
+\end_layout
+
+\begin_layout Plain Layout
+
+# z = p2 !
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Negative binomial distributions can also result from a homogeneous birth-death
+ process, births and deaths (and immigrations) occurring at random in continuous
+ time.
+ Samples from a population that starts from 0 at time 
+\begin_inset Formula $t=0$
+\end_inset
+
+, with immigration rate 
+\begin_inset Formula $i$
+\end_inset
+
+, birth rate 
+\begin_inset Formula $b$
+\end_inset
+
+, and death rate 
+\begin_inset Formula $d$
+\end_inset
+
+ will be negative binomially distributed with parameters 
+\begin_inset Formula $\mu=i/(b−d)(e^{(b−d)t}−1)$
+\end_inset
+
+ and 
+\begin_inset Formula $k=i/b$
+\end_inset
+
+ (Bailey, 1964, p.
+ 99).
+\end_layout
+
+\begin_layout Standard
+Several different ecological processes can often generate the same probability
+ distribution.
+ We can usually reason forward from knowledge of probable mechanisms operating
+ in the field to plausible distributions for modeling data, but this many-to-one
+ relationship suggests that it is unsafe to reason backwards from probability
+ distributions to particular mechanisms that generate them.
+\end_layout
+
+\begin_layout Standard
+R’s default coin-flipping (
+\begin_inset Formula $n=$
+\end_inset
+
+
+\family typewriter
+size
+\family default
+, 
+\begin_inset Formula $p=$
+\end_inset
+
+
+\family typewriter
+prob
+\family default
+) parameterization.
+ In order to use the “ecological” (
+\begin_inset Formula $µ=$
+\end_inset
+
+
+\family typewriter
+mu
+\family default
+, 
+\begin_inset Formula $k=$
+\end_inset
+
+
+\family typewriter
+size
+\family default
+) parameterization, you must name the mu parameter explicitly (e.g.
+ 
+\family typewriter
+dnbinom(5,size=0.6,mu=1)
+\family default
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted5.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Negative binomial distribution.
+ Mean 
+\begin_inset Formula $\mu=2$
+\end_inset
+
+ in all cases.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Geometric
+\end_layout
+
+\begin_layout Standard
+The geometric distribution is the number of trials (with a constant probability
+ of fail
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+(1-p
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ure) until you get a single failure: it’s a special case of the negative
+ binomial, with 
+\begin_inset Formula $k$
+\end_inset
+
+ or 
+\begin_inset Formula $n$
+\end_inset
+
+ = 1.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted6.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Geometric distribution.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Beta-Binomial
+\end_layout
+
+\begin_layout Standard
+Just as one can compound the Poisson distribution with a Gamma to allow
+ for heterogeneity in rates, producing a negative binomial, one can compound
+ the binomial distribution with a Beta distribution to allow for heterogeneity
+ in per-trial probability, producing a Beta-binomial distribution (Crowder,
+ 1978; Reeve and Murdoch, 1985; Hatfield et al., 1996).
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+most common
+\emph default
+ parameterization of the beta-binomial distribution uses the binomial parameter
+ 
+\begin_inset Formula $N$
+\end_inset
+
+ (trials per sample), plus two additional parameters 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ that describe the beta distribution of the per-trial probability.
+ When 
+\begin_inset Formula $a=b=1$
+\end_inset
+
+ the per-trial probability is equally likely to be any value between 0 and
+ 1 (the mean is 0.5), and the beta-binomial gives a uniform (discrete) distributi
+on between 0 and 
+\begin_inset Formula $N$
+\end_inset
+
+ .
+ As 
+\begin_inset Formula $a+b$
+\end_inset
+
+ increases, the variance of the underlying heterogeneity decreases and the
+ beta-binomial converges to the 
+\emph on
+binomial
+\emph default
+ distribution.
+ Morris (1997) suggests a different parameterization that uses an overdispersion
+ parameter 
+\begin_inset Formula $θ$
+\end_inset
+
+, like the 
+\begin_inset Formula $k$
+\end_inset
+
+ parameter of the negative binomial distribution.
+ In this case the parameters are 
+\begin_inset Formula $N$
+\end_inset
+
+ , the per-trial probability 
+\begin_inset Formula $p=a/(a+b)$
+\end_inset
+
+, and 
+\begin_inset Formula $θ=a+b$
+\end_inset
+
+.
+ When 
+\begin_inset Formula $θ$
+\end_inset
+
+ is large (small overdispersion), the beta-binomial becomes binomial.
+ When 
+\begin_inset Formula $θ$
+\end_inset
+
+ is near zero (large overdispersion), the beta-binomial becomes U-shaped.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted7.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Beta-binomial distribution.
+ Number of trials (
+\begin_inset Formula $N$
+\end_inset
+
+) equals 10, average per-trial probability (
+\begin_inset Formula $p$
+\end_inset
+
+) equals 0.5 for all distributions.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Continuous Distributions
+\end_layout
+
+\begin_layout Subsubsection
+Uniform distribution
+\end_layout
+
+\begin_layout Standard
+The uniform distribution with limits a and b, denoted 
+\begin_inset Formula $U(a,b)$
+\end_inset
+
+, has a constant probability density of 
+\begin_inset Formula $1/(b−a)$
+\end_inset
+
+ for 
+\begin_inset Formula $a\leq x\leq b$
+\end_inset
+
+ and zero probability elsewhere.
+ The standard uniform, 
+\begin_inset Formula $U(0,1)$
+\end_inset
+
+, is very commonly used as a building block for other distributions, but
+ is surprisingly rarely used in ecology otherwise.
+\end_layout
+
+\begin_layout Subsubsection
+Normal distribution
+\end_layout
+
+\begin_layout Subsubsection
+Gamma distribution
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+The Gamma distribution is the distribution of 
+\emph on
+waiting times
+\emph default
+ until a certain number of events take place.
+ 
+\series default
+For example, 
+\begin_inset Formula $Gamma(shape=3,scale=2)$
+\end_inset
+
+ is the distribution of the length of time (in days) you’d expect to have
+ to wait for 3 deaths in a population, given that the average survival time
+ is 2 days (mortality rate is 1/2 per day).
+ The mean waiting time is 6 days = 3 deaths/(1/2 death per day).
+ Gamma distributions with integer shape parameters are also called 
+\emph on
+Erlang
+\emph default
+ distributions.
+ The Gamma distribution is still defined for non-integer (positive) shape
+ parameters, but the simple description given above breaks down: how can
+ you define the waiting time until 3.2 events take place?
+\end_layout
+
+\begin_layout Standard
+For shape parameters ≤ 1, the Gamma has its mode at zero; for shape parameter
+ = 1, the Gamma is equivalent to the exponential (see below).
+ For shape parameter greater than 1, the Gamma has a peak (mode) at a value
+ greater than zero; as the shape parameter increases, the Gamma distribution
+ becomes more symmetrical and approaches the normal distribution.
+ This behavior makes sense if you think of the Gamma as the distribution
+ of the sum of independent, identically distributed waiting times, in which
+ case it is governed by the Central Limit Theorem.
+\end_layout
+
+\begin_layout Standard
+The scale parameter (sometimes defined in terms of a rate parameter instead,
+ 1/scale) just adjusts the mean of the Gamma by adjusting the waiting time
+ per event; however, multiplying the waiting time by a constant to adjust
+ its mean also changes the variance, so both the variance and the mean depend
+ on the scale parameter.
+\end_layout
+
+\begin_layout Standard
+The Gamma distribution is less familiar than the normal, and new users of
+ the Gamma often find it annoying that in the standard parameterization
+ you can’t adjust the mean independently of the variance.
+ You could define a new set of parameters 
+\begin_inset Formula $m$
+\end_inset
+
+ (mean) and 
+\begin_inset Formula $v$
+\end_inset
+
+ (variance), with scale = 
+\begin_inset Formula $v/m$
+\end_inset
+
+ and shape = 
+\begin_inset Formula $m^{2}/v$
+\end_inset
+
+ — but then you would find (unlike the normal distribution) the shape changing
+ as you changed the variance.
+ Nevertheless, the Gamma is extremely useful; it solves the problem that
+ many researchers face when they have a continuous variable with “
+\emph on
+too much variance
+\emph default
+”, whose coefficient of variation is greater than about 0.5.
+ Modeling such data with a normal distribution leads to unrealistic negative
+ values, which then have to be dealt with in some ad hoc way like truncating
+ them or otherwise trying to ignore them.
+ The Gamma is often a more realistic alternative.
+\end_layout
+
+\begin_layout Standard
+The Gamma is the continuous counterpart of the negative binomial, which
+ is the discrete distribution of a number of trials (rather than length
+ of time) until a certain number of events occur.
+ Both the negative binomial and Gamma distributions are often generalized,
+ however, in ways that don’t necessarily make sense according to their simple
+ mechanistic descriptions (e.g.
+ a Gamma distribution with a shape parameter of 2.3 corresponds to the distributi
+on of waiting times until 2.3 events occur .
+ .
+ .
+ ).
+\end_layout
+
+\begin_layout Standard
+The Gamma and negative binomial are both commonly used phenomenologically,
+ as skewed or overdispersed versions of the Poisson or normal distributions,
+ rather than for their mechanistic descriptions.
+ 
+\series bold
+\emph on
+The Gamma is less widely used than the negative binomial
+\emph default
+ because the negative binomial replaces the Poisson, which is restricted
+ to a particular variance, while the Gamma replaces the normal, which can
+ have any variance.
+ Thus you might use the negative binomial for any discrete distribution
+ with variance > mean, while you wouldn’t need a Gamma distribution unless
+ the distribution you were trying to match was skewed to the right.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted8.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Gamma distribution
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Exponential
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+The exponential distribution describes the distribution of waiting times
+ for a single event to happen, given that there is a constant probability
+ per unit time that it will happen.
+ It is the continuous counterpart of the geometric distribution and a special
+ case (for shape parameter
+\begin_inset Formula $=1$
+\end_inset
+
+) of the Gamma distribution
+\emph default
+.
+ It can be useful both mechanistically, as a distribution of inter-event
+ times or lifetimes, or phenomenologically, for any continuous distribution
+ that has highest probability for zero or small values.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted9.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Exponential distribution.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Beta
+\end_layout
+
+\begin_layout Standard
+The beta distribution is a continuous distribution closely related to the
+ binomial distribution.
+ 
+\emph on
+The beta distribution is the only standard continuous distribution (besides
+ the uniform distribution) with a finite range, from 0 to 1.
+
+\emph default
+ 
+\series bold
+The beta distribution is the inferred distribution of the probability of
+ success in a binomial trial with 
+\begin_inset Formula $a-1$
+\end_inset
+
+ observed successes and 
+\begin_inset Formula $b-1$
+\end_inset
+
+ observed failures.
+
+\series default
+ When 
+\begin_inset Formula $a=b$
+\end_inset
+
+ the distribution is symmetric around 
+\begin_inset Formula $x=0.5$
+\end_inset
+
+, when 
+\begin_inset Formula $a<b$
+\end_inset
+
+ the peak shifts toward zero, and when 
+\begin_inset Formula $a>b$
+\end_inset
+
+ it shifts toward 1.
+ 
+\emph on
+With 
+\begin_inset Formula $a=b=1$
+\end_inset
+
+, the distribution is 
+\begin_inset Formula $U(0,1)$
+\end_inset
+
+
+\emph default
+.
+ As 
+\begin_inset Formula $a+b$
+\end_inset
+
+ (equivalent to the total number of trials
+\begin_inset Formula $+2$
+\end_inset
+
+) gets larger, the distribution becomes more peaked.
+ For 
+\begin_inset Formula $a$
+\end_inset
+
+ or 
+\begin_inset Formula $b$
+\end_inset
+
+ less than 1, the mechanistic description stops making sense (how can you
+ have fewer than zero trials?), but the distribution is still well-defined,
+ and when a and b are both between 0 and 1 it becomes U-shaped — it has
+ peaks at 
+\begin_inset Formula $p=0$
+\end_inset
+
+ and 
+\begin_inset Formula $p=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The beta distribution is obviously good for modeling probabilities or proportion
+s.
+ It can also be useful for modeling continuous distributions with peaks
+ at both ends, although in some cases a finite mixture model may be more
+ appropriate.
+ The beta distribution is also useful whenever you have to define a continuous
+ distribution on a finite range, as it is the only such standard continuous
+ distribution.
+ It’s easy to rescale the distribution so that it applies over some other
+ finite range instead of from 0 to 1: for example, Tiwari et al.
+ (2005) used the beta distribution to describe the distribution of turtles
+ on a beach, so the range would extend from 0 to the length of the beach.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/pasted10.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Beta distribution
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Lognormal
+\end_layout
+
+\begin_layout Standard
+Its mechanistic justification is like the normal distribution (the Central
+ Limit Theorem), but for the product of many independent, identical variates
+ rather than their sum.
+ Just as taking logarithms converts products into sums, taking the logarithm
+ of a lognormally distributed variable—which might result from the product
+ of independent variables—converts it it into a normally distributed variable
+ resulting from the sum of the logarithms of those independent variables.
+ The best example of this mechanism is the distribution of the sizes of
+ individuals or populations that grow exponentially, with a per capita growth
+ rate that varies randomly over time.
+ At each time step (daily, yearly, etc.), the current size is multiplied
+ by the randomly chosen growth increment, so the final size (when measured)
+ is the product of the initial size and all of the random growth increments.
+\end_layout
+
+\begin_layout Standard
+The log-normal is also used phenomenologically in some of the same situations
+ where a Gamma distribution also fits: continuous, positive distributions
+ with long tails or variance much greater than the mean (McGill et al., 2006).
+ Like the distinction between a Michaelis-Menten and a saturating exponential,
+ you may not be able to tell the difference between a lognormal and a Gamma
+ without large amounts of data.
+ Use the one that is more convenient, or that corresponds to a more plausible
+ mechanism for your data.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+a=20;b=1;k=5
+\begin_inset Graphics
+	filename figs/pasted11.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Lognormal distribution
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Stochastic Simulation and Power Analysis
+\end_layout
+
+\begin_layout Standard
+Simulation is sometimes called 
+\emph on
+forward
+\emph default
+ modeling, to emphasize that you pick a model and parameters and work forward
+ to predict patterns in the data.
+ Parameter estimation, or 
+\emph on
+inverse
+\emph default
+ modeling (the main focus of this book), starts from the data and works
+ backward to choose a model and estimate parameters.
+ 
+\end_layout
+
+\begin_layout Section
+Stochastic Simulation
+\end_layout
+
+\begin_layout Subsection
+Simple examples
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $Y\sim Normal(a+bx,\,σ^{2})$
+\end_inset
+
+, or can also be written as 
+\begin_inset Formula $y_{i}=a+bx_{i}+ε_{i},\,ε_{i}\sim N(0,σ^{2})$
+\end_inset
+
+, specifying that the 
+\begin_inset Formula $i$
+\end_inset
+
+ th value of 
+\begin_inset Formula $Y$
+\end_inset
+
+ , 
+\begin_inset Formula $y_{i}$
+\end_inset
+
+ , is equal to 
+\begin_inset Formula $a+bx_{i}$
+\end_inset
+
+ plus a normally distributed error term with mean zero.
+ But the first form is more general.
+ Normally distributed error is one of the few kinds that can simply be added
+ onto the deterministic model in the second way.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+x=1:20;a=2;b=1 
+\end_layout
+
+\begin_layout Plain Layout
+
+y_det=a+b*x 
+\end_layout
+
+\begin_layout Plain Layout
+
+y=rnorm(20, mean=y_det, sd=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A simple simulation uses hyperbolic
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+hyperbolic function
+\end_layout
+
+\end_inset
+
+ functions (
+\begin_inset Formula $y=ab/(b+x)$
+\end_inset
+
+) with negative binomial error: in symbols, 
+\begin_inset Formula $Y\sim NegBin(µ=ab/(b+x),\,k)$
+\end_inset
+
+.
+ The function is parameterized so that a is the intercept term (when 
+\begin_inset Formula $x=0,y=ab/b=a$
+\end_inset
+
+).
+ 
+\emph on
+This simulation might represent the decreasing fecundity of two different
+ species with increasing population density; the hyperbolic function is
+ a natural expression of the decreasing quantity of a limiting resource
+ per individual.
+
+\emph default
+ In this case, we cannot express the model as the deterministic function
+ “plus error”.
+ Instead, we have to incorporate the deterministic model as a control on
+ one of the parameters of the error distribution—in this case, the mean
+ 
+\begin_inset Formula $µ$
+\end_inset
+
+.
+ (Although the negative binomial is a discrete distribution, its parameters
+ 
+\begin_inset Formula $µ$
+\end_inset
+
+ and 
+\begin_inset Formula $k$
+\end_inset
+
+ are continuous.)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+a=20;b=1;k=5
+\end_layout
+
+\begin_layout Plain Layout
+
+x=runif(50, min=0, max=5)
+\end_layout
+
+\begin_layout Plain Layout
+
+y_det=a*b/(b+x)
+\end_layout
+
+\begin_layout Plain Layout
+
+y=rnbinom(50, mu=y_det, size=k)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Likelihood and all that
+\end_layout
+
+\begin_layout Standard
+Previous chapters have introduced all the ingredients you need to define
+ a model — mathematical functions to describe the deterministic patterns
+ and probability distributions to describe the stochastic patterns — and
+ shown how to use these ingredients to simulate simple ecological systems.
+ However, you need to learn not only how to construct models but also how
+ to estimate parameters from data, and how to test models against each other.
+\end_layout
+
+\begin_layout Standard
+In general, to estimate the parameters of a model we have to find the parameters
+ that make that model fit the data best.
+ To compare among models we have to figure out which one fits the data best,
+ and decide if one or more models fit sufficiently much better than the
+ rest that we can declare them the winners.
+ Our goodness-of-fit metrics will be based on the 
+\series bold
+\emph on
+likelihood, the probability of seeing the data we actually collected given
+ a particular model
+\series default
+\emph default
+ — which in this case will mean both the general form of the model and the
+ specific parameter values.
+\end_layout
+
+\begin_layout Section
+Parameter estimation: Single distributions
+\end_layout
+
+\begin_layout Subsection
+Maximum likelihood
+\end_layout
+
+\begin_layout Standard
+We want the 
+\emph on
+maximum likelihood estimates
+\emph default
+ of the parameters — those parameter values that make the observed data
+ most likely to have happened.
+ 
+\emph on
+i.i.d
+\emph default
+ data, so the joint likelohood of the wholde data set is the product of
+ the likelihood of each individual observation.
+ For mathmatical convience, we take the logarithm of the likelihood.
+ Since the logarithm is a monotonically increasing function, the maximum
+ log-likelihood estimate is the same as the maximum likelihood estimate.
+ Actually, it is conventional to 
+\series bold
+\emph on
+minimize
+\series default
+\emph default
+ the 
+\emph on
+negative log-likelihood
+\emph default
+ rather than maximizing the log-likelihood.
+ For continuous probability distributions, we compute the probability density
+ of observing the data rather than the probability itself.
+ Since we are interested in relative (log)likelihoods, not the absolute
+ probability of observing the data, we can ignore the distinction between
+ the density (
+\begin_inset Formula $P(x)$
+\end_inset
+
+) and the probability (which includes a term for the measurement precision:
+ 
+\begin_inset Formula $P(x)dx$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsubsection
+Binomial maximum likelihood
+\end_layout
+
+\begin_layout Standard
+Analytical approach: 
+\begin_inset Formula 
+\[
+l=\prod_{i=1}^{n}\left(_{k_{i}}^{N}\right)p^{k_{i}}(1-p)^{N-k_{i}}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+L=log(l)=\sum_{i=1}^{n}\left(log\left(_{k_{i}}^{N}\right)+k_{i}log(p)+(N-k_{i})log(1-p)\right)
+\]
+
+\end_inset
+
+then solve 
+\begin_inset Formula $\frac{dL}{dp}=0$
+\end_inset
+
+, get 
+\begin_inset Formula $\hat{p}=\frac{\sum_{i=1}^{n}k_{i}}{nN}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Numerics:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+library(emdbook)
+\end_layout
+
+\begin_layout Plain Layout
+
+data(ReedfrogPred)
+\end_layout
+
+\begin_layout Plain Layout
+
+binomNLL1=function(p,k,N){-sum(dbinom(k, prob=p, size=N, log=T))}
+\end_layout
+
+\begin_layout Plain Layout
+
+x=subset(ReedfrogPred, pred=="pred" & density ==10 & size=="small")
+\end_layout
+
+\begin_layout Plain Layout
+
+k=x$surv
+\end_layout
+
+\begin_layout Plain Layout
+
+opt1=optim(fn=binomNLL1, par=c(p=0.5), N=10, k=k, method="BFGS")
+\end_layout
+
+\begin_layout Plain Layout
+
+# use method = "BFGS" for a single-parameter fit.
+\end_layout
+
+\begin_layout Plain Layout
+
+opt1$par # the estimated value of the probability
+\end_layout
+
+\begin_layout Plain Layout
+
+exp(-opt1$value) # the estimated value of max.
+ likelihood.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+#But usually we only care about the relative value.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+library(bbmle)
+\end_layout
+
+\begin_layout Plain Layout
+
+m1=mle2(minuslogl=binomNLL1, start=list(p=0.5), data=list(N=10, k=k))
+\end_layout
+
+\begin_layout Plain Layout
+
+m1
+\end_layout
+
+\begin_layout Plain Layout
+
+mle2(k~dbinom(prob=p, size=10), start=list(p=0.5))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Gamma likelihhod
+\end_layout
+
+\begin_layout Standard
+The likelihood equation for Gamma-distributed data is hard to maximize analytica
+lly, so we’ll go straight to a numerical solution.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+data(MyxoTiter_sum)
+\end_layout
+
+\begin_layout Plain Layout
+
+myxdat=subset(MyxoTiter_sum, grade==1)
+\end_layout
+
+\begin_layout Plain Layout
+
+gammaNLL1=function(shape, scale) {-sum(dgamma(myxdat$titer, shape=shape,scale=sc
+ale,log=T))}
+\end_layout
+
+\begin_layout Plain Layout
+
+# starting paramters for gamma distribution are hard to find.
+\end_layout
+
+\begin_layout Plain Layout
+
+# we can use those from the mothod of moments
+\end_layout
+
+\begin_layout Plain Layout
+
+gm=mean(myxdat$titer)
+\end_layout
+
+\begin_layout Plain Layout
+
+gvm=var(myxdat$titer)/mean(myxdat$titer)
+\end_layout
+
+\begin_layout Plain Layout
+
+m3=mle2(gammaNLL1, start=list(shape=gm/gvm, scale=gvm))
+\end_layout
+
+\begin_layout Plain Layout
+
+m3
+\end_layout
+
+\begin_layout Plain Layout
+
+mle2(myxdat$titer ~ dgamma(shape, scale = scale),start = list(shape = gm/gvm,
+ scale = gvm),data=myxdat)
+\end_layout
+
+\begin_layout Plain Layout
+
+fitdistr(myxdat$titer, "gamma") # report the rate = 1/scale
+\end_layout
+
+\begin_layout Plain Layout
+
+# fitdistr from MASS package, good for a single paramter fit.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Bayesian analysis
+\end_layout
+
+\begin_layout Standard
+Bayesian estimation also uses the likelihood, but it differs in two ways
+ from maximum likelihood analysis.
+
+\series bold
+ First
+\series default
+, we combine the likelihood with 
+\emph on
+a prior probability distribution
+\emph default
+ in order to determine a posterior probability distribution.
+ 
+\series bold
+Second
+\series default
+, we often report the 
+\emph on
+mean
+\emph default
+ of the posterior distribution rather than its mode (which would equal the
+ MLE if we were using a completely uninformative or “flat” prior).
+ Unlike the mode, which reflects only local information about the peak of
+ the distribution, the mean incorporates the entire pattern of the distribution,
+ so it can be harder to compute.
+\end_layout
+
+\begin_layout Subsubsection
+Binomial distribution conjugate priors: Beta distribution
+\end_layout
+
+\begin_layout Standard
+Conjugate priors also allow us to interpret the strength of the prior in
+ simple ways.
+ For example, the conjugate prior of the binomial likelihood that we used
+ for the tadpole predation data is the Beta distribution.
+ If we pick a Beta prior with shape parameters 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+, and if our data include a total of 
+\begin_inset Formula $\sum k$
+\end_inset
+
+ “successes” (predation events) and 
+\begin_inset Formula $nN−\sum k$
+\end_inset
+
+ “failures” (surviving tadpoles) out of a total of 
+\begin_inset Formula $nN$
+\end_inset
+
+ “trials” (exposed tadpoles), the posterior distribution is a Beta distribution
+ with shape parameters 
+\begin_inset Formula $a+\sum k$
+\end_inset
+
+, that is (
+\begin_inset Formula $a+successes$
+\end_inset
+
+) and 
+\begin_inset Formula $b+(nN−\sum k)$
+\end_inset
+
+, that is 
+\begin_inset Formula $b+failures$
+\end_inset
+
+.
+ If we interpret 
+\begin_inset Formula $a−1$
+\end_inset
+
+ as the total number of previously observed successes and 
+\begin_inset Formula $b−1$
+\end_inset
+
+ as the number of previously observed failures, then the new distribution
+ just combines the total number of successes and failures in the complete
+ (prior plus current) data set.
+ When 
+\begin_inset Formula $a=b=1$
+\end_inset
+
+, the Beta distribution is flat, corresponding to no prior information (
+\begin_inset Formula $a−1=b−1=0$
+\end_inset
+
+).
+ When 
+\begin_inset Formula $a=b\rightarrow0$
+\end_inset
+
+, we get a very peculiar prior distribution with infinite spikes at 0 and
+ 1.
+ As 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ increase, the prior distribution gains more information and becomes peaked.
+ We can also see that, as far as a Bayesian is concerned, it doesn’t matter
+ how we divide our experiments up.
+ Many small experiments, aggregated with successive uses of Bayes’ Rule,
+ give the same information as one big experiment (provided of course that
+ there is no variation in pertrial probability among sets of observations,
+ which we have assumed in our statistical model for both the likelihood
+ and the Bayesian analysis).
+ To sum up:
+\end_layout
+
+\begin_layout Enumerate
+The data: 
+\begin_inset Formula $X\sim Bin(n,p)$
+\end_inset
+
+, 
+\begin_inset Formula $f(x|p)=\frac{n!}{x!(n-x)!}p^{x}(1-p)^{n-x}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+The prior: 
+\begin_inset Formula $p\sim Beta(a,b)$
+\end_inset
+
+, 
+\begin_inset Formula $\pi(p)=\frac{p^{a-1}(1-p)^{b-1}}{Beta(a,b)}$
+\end_inset
+
+, 
+\begin_inset Formula $E(p)=\frac{a}{a+b},Var(p)=\frac{ab}{(a+b)^{2}(a+b+1)}$
+\end_inset
+
+.
+ If both 
+\begin_inset Formula $a,b$
+\end_inset
+
+ are integers, then 
+\begin_inset Formula $Beta(a,b)=\frac{(a-1)!(b-1)!}{(a+b-1)!}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+The posterior: 
+\begin_inset Formula $p|x\sim Beta(a+x,b+n-x)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Poisson distribution conjugate priors: Gamma distribution
+\end_layout
+
+\begin_layout Standard
+If our data were Poisson, we could use a conjugate prior Gamma distribution
+ with shape 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and scale 
+\begin_inset Formula $s$
+\end_inset
+
+ and interpret the parameters as 
+\begin_inset Formula $\alpha=$
+\end_inset
+
+total counts in previous observations and 
+\begin_inset Formula $1/s=$
+\end_inset
+
+number of previous observations.
+ Then if we observed 
+\begin_inset Formula $C$
+\end_inset
+
+ counts in our data, the posterior would be a Gamma distribution with 
+\begin_inset Formula $\alpha'=\alpha+C$
+\end_inset
+
+, 
+\begin_inset Formula $1/s'=1/s+1$
+\end_inset
+
+.
+ Sum up:
+\end_layout
+
+\begin_layout Enumerate
+The data: 
+\begin_inset Formula $X\sim Poisson(\lambda)$
+\end_inset
+
+, 
+\begin_inset Formula $f(x|\lambda)=\frac{\lambda^{x}e^{-\lambda}}{x!}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+The prior: 
+\begin_inset Formula $\lambda\sim Gamma(shape=\alpha,rate=\frac{1}{s})$
+\end_inset
+
+.
+ Some define the Gamma distribution in terms of 
+\begin_inset Formula $scale=s$
+\end_inset
+
+.
+ 
+\begin_inset Formula $\pi(\lambda)=\frac{(1/s)^{\alpha}}{\Gamma(\alpha)}\lambda^{\alpha-1}e^{-\beta\lambda}$
+\end_inset
+
+.
+ 
+\begin_inset Formula $\Gamma(\alpha)$
+\end_inset
+
+ is the Gamma function.
+ 
+\begin_inset Formula $E(\lambda)=\alpha s,\,Var(\lambda)=\alpha s^{2}$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is a positive integer, then 
+\begin_inset Formula $\Gamma(\alpha)=(\alpha-1)!$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+The posterior: 
+\begin_inset Formula $\lambda|x_{1},\cdots,x_{n}\sim Gamma(\alpha+\sum x_{i},\frac{1}{s}+n)$
+\end_inset
+
+.
+ In the above example, 
+\begin_inset Formula $x_{1}=C,n=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Normal distribution conjugate priors
+\end_layout
+
+\begin_layout Itemize
+Normal with known variance, unkown mean
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The data: 
+\begin_inset Formula $X\sim N(\mu,\sigma^{2}=1)$
+\end_inset
+
+, we know 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+, say 
+\begin_inset Formula $\sigma^{2}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+The prior: 
+\begin_inset Formula $\mu\sim N(\theta=3,\tau^{2}=4)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+The posterior: 
+\begin_inset Formula $\mu|x_{1},\cdots,x_{n}=N\left(\frac{\frac{n\overline{X}}{\sigma^{2}}+\frac{\theta}{\tau^{2}}}{\frac{n}{\sigma^{2}}+\frac{1}{\tau^{2}}},\frac{1}{\frac{n}{\sigma^{2}}+\frac{1}{\tau^{2}}}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Normal with known mean, unkown variance
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The data: 
+\begin_inset Formula $X\sim N(\mu=1,\sigma^{2})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+The prior of precision: 
+\begin_inset Formula $\varnothing=\frac{1}{\sigma^{2}}=Gamma(shape=\alpha,rate=\beta)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+The posterior: 
+\begin_inset Formula $\varnothing|x_{1},\cdots,x_{n}=Gamma(shape=\alpha+\frac{n}{2},\,rate=\beta+\sum(x_{i}-\mu)^{2}/2$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Normal with unkown mean, unkown variance
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The data: 
+\begin_inset Formula $X\sim N(\mu,\sigma^{2})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+The prior: 
+\begin_inset Formula $\mu|\sigma^{2}\sim N(\mu_{0},\sigma^{2}/\lambda)$
+\end_inset
+
+.
+ Note that this prior for 
+\begin_inset Formula $\mu$
+\end_inset
+
+ depends on the unknown 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+ .
+ 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+~ Inverse 
+\begin_inset Formula $\chi^{2}$
+\end_inset
+
+ with df 
+\begin_inset Formula $v$
+\end_inset
+
+ and scale 
+\begin_inset Formula $\sigma_{0}^{2}$
+\end_inset
+
+ .
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $\mu|$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $x_{1},\cdots,x_{n}\sim t$
+\end_inset
+
+ with df 
+\begin_inset Formula $v+n$
+\end_inset
+
+.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+center
+\begin_inset Quotes erd
+\end_inset
+
+ of the 
+\begin_inset Formula $t$
+\end_inset
+
+ distribution is 
+\begin_inset Formula $\frac{\lambda}{\lambda+n}\mu_{0}+\frac{n}{\lambda+n}\bar{x}$
+\end_inset
+
+.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+scale
+\begin_inset Quotes erd
+\end_inset
+
+ of the 
+\begin_inset Formula $t$
+\end_inset
+
+ posterior is a weighted average of 
+\begin_inset Formula $\sigma_{0}^{2}$
+\end_inset
+
+, the sample variance 
+\begin_inset Formula $s^{2}$
+\end_inset
+
+, and 
+\begin_inset Formula $(\bar{x}-\mu_{0})^{2}$
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+Gamma distribution: nonconjugate prior.
+\end_layout
+
+\begin_layout Standard
+Unfortunately simple conjugate priors aren’t always available, and we often
+ have to resort to numerical integration to evaluate Bayes’ Rule.
+ Just plotting the numerator of Bayes’ Rule, (
+\begin_inset Formula $prior(p)×L(p)$
+\end_inset
+
+), is easy: for anything else, we need to integrate (or use summation to
+ approximate an integral).
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Bayesians often use the Gamma as a prior distribution for parameters that
+ must be positive
+\series default
+.
+ Using a small shape parameter gives the distribution a large variance (correspo
+nding to little prior information) and means that the distribution will
+ be peaked at small values but is likely to be flat over the range of interest.
+ Finally, the scale is usually set large enough to make the mean of the
+ parameter (= shape · scale) reasonable.
+\end_layout
+
+\begin_layout Standard
+For a Gamma distribution with shape
+\begin_inset Formula $=a$
+\end_inset
+
+ and scale
+\begin_inset Formula $=s$
+\end_inset
+
+.
+ Example: Prior(a)
+\begin_inset Formula $\sim$
+\end_inset
+
+Gamma(
+\begin_inset Formula $shape=0.01,scale=100$
+\end_inset
+
+); Prior(s)=Gamma(
+\begin_inset Formula $shape=0.1,scale=10$
+\end_inset
+
+); Prior(a,s)
+\begin_inset Formula $=$
+\end_inset
+
+Prior(a)
+\begin_inset Formula $\times$
+\end_inset
+
+Prior(s).
+\begin_inset Formula 
+\[
+Posterior(a,s)=\frac{Prior(a,s)\times\mathcal{L}(a,s)}{\iint Prior(a,s)\times\mathcal{L}(a,s)da\,ds}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\bar{a}=\iint Prior(a,s)\times\mathcal{L}(a,s)\,a\,da\,ds;\bar{s}=\iint Prior(a,s)\times\mathcal{L}(a,s)\,s\,da\,ds
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+prior.as=function(a,s) {dgammaa(a, shape=0.01,scale=100)*dgamma(s,shape=0.1,scale=1
+0)}
+\end_layout
+
+\begin_layout Plain Layout
+
+unscaled.posterior=function(a,s){prior.as(a,s)*exp(-gammaNLL1(shape=a,scale=s))}
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and use integrate (for 1-dimensional integrals) or adapt (in the adapt package;
+ for multi-dimensional integrals) to do the integration.
+ More crudely, we can approximate the integral by a sum, calculating values
+ of the integrand for discrete values.
+ However, integrating probabilities is tricky for two reasons.
+ (1) Prior probabilities and likelihoods are often tiny for some parameter
+ values, leading to roundoff error; tricks like calculating log-probabilities
+ for the prior and likelihood, adding, and then exponentiating can help.
+ (2) You must pick the number and range of points at which to evaluate the
+ integral carefully.
+ Too coarse a grid leads to approximation error, which may be severe if
+ the function has sharp peaks.
+ Too small a range, or the wrong range, can miss important parts of the
+ surface.
+ In practice, brute-force numerical integration is no longer feasible with
+ models with more than about two parameters.
+ The only practical alternatives are Markov chain Monte Carlo approaches.
+\end_layout
+
+\begin_layout Section
+Estimation for more complex functions
+\end_layout
+
+\begin_layout Subsection
+Maximum likelihood
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex Chunk
+status open
+
+\begin_layout Plain Layout
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+eval=T
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+mle2(titer~dgamma(shape,scale=a*day*exp(-b*day)/shape), start=list(a=1,
+ b=0.2, shape=50), data=myxdat,method="Nelder-Mead") 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Bayesian analysis
+\end_layout
+
+\begin_layout Standard
+MCMC.
+ BUGS’s modeling language is similar but not identical to R.
+ For example, BUGS requires you to use 
+\family typewriter
+<-
+\family default
+ instead of 
+\family typewriter
+=
+\family default
+ for assignments.
+ BUGS uses shape and rate parameters to define the Gamma distribution rather
+ than shape and scale parameters: differences in parameterization are some
+ of the most important differences between the BUGS and R languages.
+ tilde (
+\family typewriter
+~
+\family default
+) means “is distributed as”.
+\end_layout
+
+\begin_layout Section
+Likelihood surfaces, profiles, and confidence intervals
+\end_layout
+
+\begin_layout Subsection
+Frequentist analysis: likelihood curves and profiles
+\end_layout
+
+\begin_layout Standard
+The most basic tool for understanding how likelihood depends on one or more
+ parameters is the 
+\emph on
+likelihood curve
+\emph default
+ or 
+\emph on
+likelihood surface
+\emph default
+, which is just the likelihood plotted as a function of parameter values.
+ By convention, we plot the negative log-likelihood rather than log-likelihood,
+ so the best estimate is a minimum rather than a maximum.
+ On a negative log-likelihood curve or surface, higher points represent
+ worse fits.
+\end_layout
+
+\begin_layout Standard
+If we want to deal with models with more than two parameters, or if we want
+ to analyze a single parameter at a time, we have to find a way to isolate
+ the effects of one or more parameters while still accounting for the rest.
+ A simple, but usually 
+\series bold
+wrong
+\series default
+, way of doing this is to calculate a likelihood 
+\emph on
+slice
+\emph default
+, fixing the values of all but one parameter (usually at their maximum likelihoo
+d estimates) and then calculating the likelihood for a range of values of
+ the focal parameter.
+\end_layout
+
+\begin_layout Standard
+Instead, we calculate likelihood 
+\emph on
+profiles
+\emph default
+, which represent “ridgelines” in parameter space showing the minimum negative
+ log-likelihoods for particular values of a single parameter.
+ To calculate a likelihood profile for a focal parameter, we have to set
+ the focal parameter in turn to a range of values, and for each value optimize
+ the likelihood with respect to all of the other parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+Slices are always steeper than profiles, because they don’t allow the other
+ parameters to adjust to changes in the focal parameter.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+The likelihood ratio test
+\end_layout
+
+\begin_layout Standard
+Take some likelihood function 
+\begin_inset Formula $L(p_{1},p_{2},...,p_{n})$
+\end_inset
+
+, and find the overall best (maximum likelihood) value, 
+\begin_inset Formula $L_{abs}=L(\hat{p}_{1},\hat{p}_{2},...,\hat{p}_{n})$
+\end_inset
+
+ (“abs” stands for “absolute”).
+ Now fix some of the parameters (say 
+\begin_inset Formula $p_{1}...p_{r}$
+\end_inset
+
+ ) to specific values (
+\begin_inset Formula $p_{1}^{∗},...p_{r}^{∗}$
+\end_inset
+
+), and maximize with respect to the remaining parameters to get 
+\begin_inset Formula $L_{restr}=L(p_{1}^{\ast},...p_{r}^{\ast},\hat{p}_{r+1},...,\hat{p}_{n})$
+\end_inset
+
+ (“restr” stands for “restricted”, sometimes also called a 
+\emph on
+reduced or nested
+\emph default
+ model).
+ The Likelihood Ratio Test says that the distribution of twice the negative
+ log of the likelihood ratio, 
+\begin_inset Formula $−2log(L_{restr}/L_{abs})$
+\end_inset
+
+, called the 
+\emph on
+deviance
+\emph default
+, is approximately 
+\begin_inset Formula $χ^{2}$
+\end_inset
+
+ (“chi-squared”) distribution with 
+\begin_inset Formula $r$
+\end_inset
+
+ degrees of freedom.
+\begin_inset Formula 
+\[
+2\left(-\log\mathcal{L}_{restr}-(-\log\mathcal{L}_{abs})\right)\sim\chi_{r}^{2}
+\]
+
+\end_inset
+
+The definition of the LRT echoes the definition of the likelihood profile,
+ where we fix one parameter and maximize the likelihood/minimize the negative
+ log-likelihood with respect to all the other parameters: 
+\begin_inset Formula $r=1$
+\end_inset
+
+ in the definition above.
+ Thus, for univariate confidence limits we cut off the likelihood profile
+ at (min.
+ neg.
+ log.
+ likelihood + 
+\begin_inset Formula $χ_{1}^{2}(1−α)/2$
+\end_inset
+
+), where 
+\begin_inset Formula $α$
+\end_inset
+
+ is our chosen confidence level (0.95, 0.99, etc.).
+ (The cutoff is a one-tailed test, since we are looking only at differences
+ in likelihood that are larger than expected under the null hypothesis.)
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+R
+\family default
+ can compute profiles and profile confidence limits automatically.
+ Given an 
+\family typewriter
+mle2
+\family default
+ fit 
+\family typewriter
+m
+\family default
+, 
+\family typewriter
+profile(m)
+\family default
+ will compute a likelihood profile and 
+\family typewriter
+confint(m)
+\family default
+ will compute profile confidence limits.
+ 
+\family typewriter
+plot(profile(m2))
+\family default
+ will plot the profile, square-root transformed so that a quadratic profile
+ will appear V-shaped (or linear if you specify 
+\family typewriter
+absval=FALSE
+\family default
+).
+ This transformation makes it easier to see whether the profile is quadratic,
+ since it’s easier to see whether a line is straight than it is to see whether
+ it’s quadratic.
+\end_layout
+
+\begin_layout Standard
+The LRT is only correct asymptotically, for large data sets.
+ For small data sets it is an approximation, although one that people use
+ very freely.
+ The other limitation of the LRT that frequently arises, although it is
+ often ignored, is that it only works when the best estimate of the parameter
+ is not on the edge of its allowable range (Pinheiro and Bates, 2000).
+ For example, if you are fitting an exponential model 
+\begin_inset Formula $y=\exp(rx)$
+\end_inset
+
+ that must be decreasing, so that 
+\begin_inset Formula $r\leq0$
+\end_inset
+
+, and your best estimate of 
+\begin_inset Formula $r$
+\end_inset
+
+ is equal to 0, then the LRT estimate for the upper bound of the confidence
+ limit is not technically correct.
+\end_layout
+
+\begin_layout Subsection
+Bayesian approach: posterior distribution and marginal distributions
+\end_layout
+
+\begin_layout Standard
+Instead of drawing likelihood curves, Bayesians draw the posterior distribution
+ (proportional to prior × L).
+ Instead of calculating confidence limits using the (frequentist) LRT, they
+ define the 
+\emph on
+credible interval
+\emph default
+, which is the region in the center of the distribution containing 95% (or
+ some other standard proportion) of the probability of the distribution,
+ 
+\emph on
+bounded by values on either side that have the 
+\series bold
+same
+\series default
+ probability 
+\emph default
+(or probability density).
+ Technically, the credible interval is the interval 
+\begin_inset Formula $[x_{1},x_{2}]$
+\end_inset
+
+ such that 
+\begin_inset Formula $P(x_{1})=P(x_{2})$
+\end_inset
+
+ and 
+\begin_inset Formula $C(x_{2})−C(x_{1})=1−α$
+\end_inset
+
+, where P is the probability density and C is the cumulative density.
+ The credible interval is slightly different from the frequentist confidence
+ interval, which is defined as 
+\begin_inset Formula $[x_{1},x_{2}]$
+\end_inset
+
+ such that 
+\begin_inset Formula $C(x_{1})=α/2$
+\end_inset
+
+ and 
+\begin_inset Formula $C(x_{2})=1−α/2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+marginal probability density
+\emph default
+ is the Bayesian analogue of the likelihood profile.
+ Where frequentists use likelihood profiles to make inferences about a single
+ parameter while taking the effects of the other parameters into account,
+ Bayesians use the marginal posterior probability density, the overall probabili
+ty for a particular value of a focal parameter integrated over all the other
+ parameters.
+ 
+\end_layout
+
+\begin_layout Section
+Confidence intervals for comples models: quadratic approximation
+\end_layout
+
+\begin_layout Section
+Comparing models
+\end_layout
+
+\begin_layout Standard
+Parsimony (sometimes called “Occam’s razor”) is a general argument for choosing
+ simpler models even though we know the world is complex.
+ All other things being equal, we should prefer a simpler model to a more
+ complex one — especially when the data don’t tell a clear story.
+ Model selection approaches typically go beyond parsimony to say that a
+ more complex model must be not just better than, but a specified amount
+ better than, a simpler model.
+ If the more complex model doesn’t exceed a threshold of improvement in
+ fit (we will see below exactly where this threshold comes from), we typically
+ reject it in favor of the simpler model.
+\end_layout
+
+\begin_layout Standard
+Model complexity also affects our predictive ability.
+ Walters and Ludwig (1981) simulated fish population dynamics using a complex
+ agestructured model and showed that in many cases, when data were realistically
+ sparse and noisy, they could best predict future (simulated) dynamics using
+ a simpler non-age-structured model.
+ In other words, even though they knew for sure that juveniles and adults
+ had different mortality rates (because they simulated the data from a model
+ with mortality differences), a model that ignored this distinction gave
+ more accurate predictions.
+ This apparent paradox is an example of the 
+\series bold
+\emph on
+bias-variance tradeoff 
+\series default
+\emph default
+introduced in Chapter 5.
+ As we add more parameters to a model, we necessarily get an increasingly
+ precise fit to the particular data we have observed (the bias decreases),
+ but our accuracy for predicting future observations decreases as well (the
+ variance increases).
+ Data contain a fixed amount of information; as we estimate more and more
+ parameters we spread the data thinner and thinner.
+ Eventually the gain in precision from having more details in the model
+ is outweighed by the loss in accuracy from estimating the effect of each
+ of those details more poorly.
+ In Ludwig and Walters’s case, spreading the data out across age classes
+ meant there was not enough data to estimate each age class’s dynamics accuratel
+y.
+\end_layout
+
+\begin_layout Subsection
+Likelihood ratio test: nested models
+\end_layout
+
+\begin_layout Standard
+Comparisons among different groups can also be framed as a comparison of
+ nested models.
+ If the more complex model has the mean of group 1 equal to 
+\begin_inset Formula $a1$
+\end_inset
+
+ and the mean of group 2 equal to 
+\begin_inset Formula $a2$
+\end_inset
+
+ , then the nested model (both groups equivalent) applies when 
+\begin_inset Formula $a1=a2$
+\end_inset
+
+ .
+ It is also common to parameterize this model as 
+\begin_inset Formula $a2=a1+δ12$
+\end_inset
+
+ , where 
+\begin_inset Formula $δ12=a2−a1$
+\end_inset
+
+ , so that the simpler model applies when 
+\begin_inset Formula $δ12=0$
+\end_inset
+
+.
+ This parameterization works better for model comparisons since testing
+ the hypothesis that the more complex model is better becomes a test of
+ the value of one parameter (
+\begin_inset Formula $δ12=0?$
+\end_inset
+
+) rather than a test of the relationship between two parameters (
+\begin_inset Formula $a1=a2$
+\end_inset
+
+ ?).
+\end_layout
+
+\begin_layout Standard
+The Likelihood Ratio Test can compare any two nested models, testing whether
+ the nesting parameters of the more complex model differ significantly from
+ their null values.
+ Put another way, the LRT tests whether the extra goodness of fit to the
+ data is worth the added complexity of the additional parameters.
+ To use the LRT to compare models, compare the difference in deviances (the
+ more complex model should always have a smaller deviance — if not, check
+ for problems with the optimization) to the critical value of the 
+\begin_inset Formula $χ^{2}$
+\end_inset
+
+ distribution, with degrees of freedom equal to the additional number of
+ parameters in the more complex model.
+ If the difference in deviances is greater than 
+\begin_inset Formula $χ_{n2−n1}^{2}(1−α)$
+\end_inset
+
+, then the more complex model is significantly better at the 
+\begin_inset Formula $p=α$
+\end_inset
+
+ level.
+ If not, then the additional complexity is not justified.
+\end_layout
+
+\begin_layout Standard
+Choosing among statistical distributions can often be reduced to comparing
+ among nested models.
+ The most common use of the LRT in this context is to see whether we need
+ to use an 
+\emph on
+overdispersed distribution such as the negative binomial or beta-binomial
+\emph default
+ instead of their 
+\emph on
+lower-variance counterparts (Poisson or binomial)
+\emph default
+.
+ 
+\series bold
+The Poisson distribution is nested in the negative binomial distribution
+ when 
+\begin_inset Formula $k→∞$
+\end_inset
+
+.
+
+\series default
+ If we fit a model with 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ varying but using a Poisson distribution instead of a negative binomial,
+ we can then use the LRT to see if adding the overdispersion parameter is
+ justified: 
+\family typewriter
+anova(poisfit.ab, nbfit.ab)
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Information criteria
+\end_layout
+
+\begin_layout Standard
+One way to avoid having to make pairwise model comparisons is to select
+ models based on 
+\emph on
+information criteria
+\emph default
+, which compare all candidate models at once and do not require nested alternati
+ves.
+ These relatively recent alternatives to likelihood ratio tests are based
+ on the expected distance (quantified in a way that comes from information
+ theory) between a particular model and the “true” model (Burnham and Anderson,
+ 1998, 2002).
+ In practice, all information-theoretic methods reduce to the finding the
+ model that minimizes some criterion that is the sum of a term based on
+ the likelihood (usually twice the negative log-likelihood) and a 
+\emph on
+penalty term
+\emph default
+ which is different for different information criteria.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+For all information criteria, small values represent better overall fits.
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+Akaike Information Criterion
+\emph default
+, or AIC, is the most widespread information criterion, and is defined as
+ 
+\begin_inset Formula $AIC=-2L+2k$
+\end_inset
+
+, where 
+\begin_inset Formula $L$
+\end_inset
+
+ is the log-likelihood and 
+\begin_inset Formula $k$
+\end_inset
+
+ is the number of parameters in the model.
+ For small sample sizes (n) — such as when n/k < 40 (Burnham and Anderson,
+ 2004, p.
+ 66)) — you should use a finite-size correction and apply the 
+\begin_inset Formula $AIC_{c}=AIC+\frac{2k(k+1)}{n-k-1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The second most common information criterion, the 
+\emph on
+Schwarz criterion
+\emph default
+ or 
+\emph on
+Bayesian information criterion
+\emph default
+ (SC/BIC) ∗ , uses a penalty term of 
+\begin_inset Formula $(logn)k$
+\end_inset
+
+.
+ When n is greater than 
+\begin_inset Formula $e^{2}≈9$
+\end_inset
+
+ observations (so that log n > 2), the BIC is more conservative than the
+ AIC, insisting on a greater improvement in fit before it will accept a
+ more complex model.
+\end_layout
+
+\begin_layout Standard
+Information criteria do not allow frequentist significance tests based on
+ the estimated probability of getting more extreme results in repeated experimen
+ts (some statisticians would say this is an advantage).
+ 
+\series bold
+With ICs, you cannot say that there is a statistically significant difference
+ between models
+\series default
+; a model with a lower IC is better, but there is no p-value associated
+ with how much better it is.
+ Instead, there are 
+\series bold
+\emph on
+commonly used rules of thumb
+\series default
+\emph default
+: 
+\series bold
+models with ICs less than 2 apart (∆IC < 2) are more or less equivalent;
+ those with ICs 4-7 apart are clearly distinguishable; and models with ICs
+ more than 10 apart are definitely different
+\series default
+.
+ Richards (2005) concurs with these recommendations, but cautions that simply
+ dropping models with ∆AIC > 2 (as some ecologists do) will probably discard
+ useful models.
+\end_layout
+
+\begin_layout Standard
+One big advantage of IC-based approaches is that they do not require nested
+ models.
+ You can compare all models to each other, rather than stepping through
+ a sometimes confusing sequence of pairwise tests.
+ In ICbased approaches, you simply compute the likelihood and IC for all
+ of the candidate models and rank them in order of increasing IC.
+ The model with the lowest IC is the best fit to the data; those models
+ with ICs within 10 units of the minimum IC are worth considering.
+ As with the LRT, the absolute size of the ICs is unimportant — only the
+ differences in ICs matter.
+\end_layout
+
+\begin_layout Subsection
+Bayesian analyses
+\end_layout
+
+\begin_layout Standard
+Bayesians are on the whole less interested in formal methods of model selection.
+ Dropping a parameter from a model is often equivalent to testing a null
+ hypothesis that the parameter is exactly zero, and Bayesians consider such
+ point null hypotheses silly.
+ They would describe a parameter’s distribution as being concentrated near
+ zero rather than saying its value is exactly zero.
+\end_layout
+
+\begin_layout Standard
+The marginal likelihood of a model is the probability of observing the data
+ (likelihood), averaged over the prior distribution of the parameters:
+\begin_inset Formula 
+\[
+\hat{L}=\int L(x)\cdot Prior(x)dx
+\]
+
+\end_inset
+
+where x represents a parameter or set of parameters (if a set, then the
+ integral would be a multiple integral).
+ The marginal likelihood (the average probability of observing a particular
+ data set exactly ) is often very small, and we are really interested in
+ the relative probability of different models.
+ If we have two models with marginal likelihoods 
+\begin_inset Formula $ˆL1$
+\end_inset
+
+ and 
+\begin_inset Formula $ˆL2$
+\end_inset
+
+, the 
+\emph on
+Bayes factor
+\emph default
+ is the ratio of the marginal likelihoods, 
+\begin_inset Formula $B12=ˆL1/ˆL2$
+\end_inset
+
+ , or the odds in favor of model 1.
+\end_layout
+
+\begin_layout Standard
+A more recent criterion, conveniently built into WinBUGS, is the DIC or
+ 
+\emph on
+deviance information criterion
+\emph default
+, which was designed particularly for models containing random effects where
+ even specifying the number of parameters is confusing.
+\end_layout
+
+\begin_layout Subsection
+Model weighting and averaging
+\end_layout
+
+\begin_layout Standard
+Bayesians themselves would say that you should not simply select one model.
+ Taking the best model and ignoring the rest is equivalent to assigning
+ a probability of 1.0 to the best and 0.0 to the rest.
+ Model averaging methods take the average of the predictions of different
+ models, weighted by the probability of the models or by some other index.
+\end_layout
+
+\end_body
+\end_document
