@@ -1,0 +1,11 @@
+*~
+*#
+
+.ipynb_checkpoints/
+
+# rstudio #
+###########
+*.Rproj
+.Rproj.user
+*.RData
+*.Rhistory
