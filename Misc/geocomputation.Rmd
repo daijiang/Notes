@@ -1,0 +1,342 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = F)
+```
+
+```{r}
+xfun::pkg_attach2(c('sf', 'raster', 'spData', 'spDataLarge', 'dplyr'))
+```
+
+
+# Geocomputation R functions
+
+- `st_combine()` or `st_union()`: combine several feature geometries into one
+- `st_geometry()`: get the geometry of a sf object; can be used for plotting, e.g. `plot(st_geometry(world))`
+    + another tip for just plotting the boundary: `plot(world[0])` (select no column and the geometry column is sticky)
+- `st_centroid()`: get the centroid of each feature; sometimes the geographic centroid falls outside the boundaries of their parent objects (think of a doughnut). In such cases `st_point_on_surface()` can be used to guarantee the point will be in the parent object
+- `st_crs()` to check which crs an object has
+- `st_set_crs()`: specify CRS
+- `st_transform()`: transform to another CRS system, e.g. 
+    + `world_proj = st_transform(world, crs = "+proj=eck4")`
+    + `st_transform(world, crs = "+proj=laea +x_0=0 +y_0=0 +lon_0=-74 +lat_0=40")` centered at NY city
+- `projectRaster()`: modify crs of project file, use argument `method = 'ngb'` for categorical data
+- `st_graticule()`: compute graticules and their parameters, e.g. `g = st_graticule(world)`
+
+    ```{r}
+    plot(world_proj["continent"], reset = FALSE, main = "", key.pos = NULL)
+    g = st_graticule()
+    g = st_transform(g, crs = "+proj=eck4")
+    plot(g$geometry, add = TRUE, col = "lightgrey")
+    ```
+
+- `st_proj_info(type = 'datum')` and `st_proj_info(type = 'proj')`: projection information
+- `rgdal::make_EPSG()`: EPSG code 
+- `st_area()`, `st_length()`, and `st_distance()`: calculate geometric measurements, e.g. `cn = st_area(world[world$name_long == 'China',])`. If CRS is set, the results comes with units; to convert units, try `units::set_units(cn, 'km^2')`
+- `st_set_geometry(world, NULL)`: remove geometry and get a pure data frame
+- `st_sf(data.frame(n = world$name_long), g = world$geom)`: create sf object
+- It is possible to filter a sf object by another sf object!
+
+    ```{r}
+    canterbury = dplyr::filter(nz, REGC2017_NAME == "Canterbury Region")
+    canterbury_height = nz_height[canterbury, ] # filter by another sf object
+    plot(st_geometry(canterbury))
+    plot(canterbury_height, add = T, col = 'red')
+    canterbury_height2 = nz_height[canterbury, , op = st_disjoint]
+    plot(canterbury_height2, add = T, color = 'blue')
+    ```
+
+- `st_intersects()`: tests whether two sf objects intersect, e.g. `st_intersects(x = nz_height, y = canterbury, sparse = FALSE)`, the opposite is `st_disjoint()`; other similar functions `st_within()`, `st_touches()`, `st_is_within_distance()`, `st_contains()`, etc.
+- `st_cast()`: convert different types of geometries
+- `st_buffer()`: create a buffer aound, better to use it on projected crs
+
+- `raster::aggregate()` and `raster::disaggregate()`: change resolution of raster
+
+# Common R data packages
+
+|Package       |Description                                                                  |
+|:-------------|:----------------------------------------------------------------------------|
+|getlandsat    |Provides access to Landsat 8 data.                                           |
+|osmdata       |Download and import of OpenStreetMap data.                                   |
+|raster        |getData() imports administrative, elevation, WorldClim data.                 |
+|rnaturalearth |Access to Natural Earth vector and raster data.                              |
+|rnoaa         |Imports National Oceanic and Atmospheric Administration (NOAA) climate data. |
+|rWBclimate    |Access World Bank climate data.                                              |
+
+# Common tasks
+
+## We have points, which of them fall in a polygon? (spatial subsetting)
+
+```{r}
+nz_height # high points in new zealand
+canterbury = dplyr::filter(nz, REGC2017_NAME == "Canterbury Region") # polygon of one state
+canterbury_height = nz_height[canterbury, ] # filter by another sf object
+plot(st_geometry(nz))
+plot(st_geometry(canterbury), col = 'gray', add = T)
+plot(canterbury_height, add = T, col = 'red')
+canterbury_height2 = nz_height[canterbury, , op = st_disjoint] # outside of a polygon
+plot(canterbury_height2, add = T, col = 'blue')
+
+ht_state = st_join(nz_height, nz) # which state each high point belongs to?
+# can even add a buffer around each state; some point will have multiple states then
+ht_state = st_join(nz_height, nz, join = st_is_within_distance, dist = 10000) 
+
+nz_avheight = aggregate(x = nz_height, by = nz, FUN = mean) # average elevation per region
+```
+
+
+## We have points on earth, which country are they in? (spatial join)
+
+```{r}
+set.seed(2018) 
+(bb_world = st_bbox(world)) 
+random_df = tibble::tibble(
+  x = runif(n = 10, min = bb_world[1], max = bb_world[3]),
+  y = runif(n = 10, min = bb_world[2], max = bb_world[4])
+)
+random_points = random_df %>% 
+  st_as_sf(coords = c("x", "y")) %>%
+  st_set_crs(4326)
+world$name_long = as.character(world$name_long)
+world_random = world[random_points, ] # wow, you can subset a polygon by another one
+# or use st_join()
+random_joined = st_join(random_points, world["name_long"], join = st_intersects)
+```
+
+## We have a raster over a large area, how do we crop it down for a small areas with shapefile?
+
+```{r}
+srtm = raster(system.file("raster/srtm.tif", package = "spDataLarge")) # raster
+zion = st_read(system.file("vector/zion.gpkg", package = "spDataLarge")) # vector shapefile
+zion = st_transform(zion, projection(srtm)) # same crs
+zion_sp = as(zion, 'Spatial')
+# first, crop the raster to have the same extent with the smaller area
+srtm_cropped = crop(srtm, zion_sp)
+srtm_masked = mask(srtm, zion_sp)
+srtm_masked_inv = mask(srtm, zion_sp, inverse = T)
+plot(srtm_cropped)
+plot(srtm_masked)
+plot(srtm_masked_inv)
+```
+
+## If we have a raster, how can we get values for some specific points?
+
+This is raster extraction. The reverse of raster extraction — assigning raster cell values based on vector objects — is rasterization. An issue with `raster::extract()`, however, is that it is relatively slow. If this is a problem it is useful to know about alternatives and work-arounds:
+
+- Parallelization: this approach works when using many geographic vector selector objects by splitting them into groups and extracting cell values independently for each group (see `?raster::clusterR()` for details of this approach).
+- Use the `velox` package (Hunziker 2017), which provides a fast method for extracting raster data that fits in memory (see the packages extract vignette for details).
+
+```{r}
+raster::extract(srtm, zion_points)
+# all elevation around a buffer for each point
+raster::extract(srtm, zion_points, buffer = 1000) # 1km
+
+# extract along transect
+zion_transect = cbind(c(-113.2, -112.9), c(37.45, 37.2)) %>%
+  st_linestring() %>% 
+  st_sfc(crs = projection(srtm)) %>% 
+  st_sf()
+transect = raster::extract(srtm, zion_transect, along = TRUE, cellnumbers = TRUE)
+transect_df = map_dfr(transect, as_data_frame, .id = "ID") # to df
+transect_coords = xyFromCell(srtm, transect_df$cell) # get lat/long
+transect_df$dist = c(0, cumsum(geosphere::distGeo(transect_coords))) # distances between points  
+
+# extract by polygon(s)
+zion_srtm_values = raster::extract(x = srtm, y = zion, df = TRUE)
+# Such results can be used to generate summary statistics for raster values per polygon
+zion_nlcd = raster::extract(nlcd, zion, df = TRUE, factors = TRUE) 
+# return factor values instead of integers
+```
+
+## We have a distribution shape file (polygon or points) of a species, how do we convert it to equal-area grid cells?
+
+This can be done with rasterization. Rasterization is the conversion of vector objects into their representation in raster objects. The raster package contains the function `rater::rasterize()` for doing this work. Its first two arguments are x, vector object to be rasterized and y, a ‘template raster’ object defining the extent, resolution and CRS of the output.
+
+```{r}
+cycle_hire_osm_projected = st_transform(cycle_hire_osm, 27700)
+raster_template = raster(extent(cycle_hire_osm_projected), resolution = 1000,
+                         crs = st_crs(cycle_hire_osm_projected)$proj4string)
+# convert to presence-absence raster with field = 1
+ch_raster1 = rasterize(cycle_hire_osm_projected, raster_template, field = 1)
+plot(ch_raster1)
+# count the number of points within a cell
+ch_raster2 = rasterize(cycle_hire_osm_projected, raster_template, 
+                       field = 1, fun = "count")
+plot(ch_raster2)
+# sum a specific variable for each cell
+ch_raster3 = rasterize(cycle_hire_osm_projected, raster_template, 
+                       field = "capacity", fun = sum)
+plot(ch_raster3)
+
+# another example
+california = dplyr::filter(us_states, NAME == "California")
+plot(california[1])
+california_borders = st_cast(california, "MULTILINESTRING") # cast polygon to multilinestring
+plot(california_borders)
+raster_template2 = raster(extent(california), resolution = 0.5,
+                         crs = st_crs(california)$proj4string)
+# Line rasterization: all cells that are touched by a line get a value
+california_raster1 = rasterize(california_borders, raster_template2)
+plot(california_raster1)
+# Polygon rasterization: only cells whose centroids are inside the selector polygon get a value
+california_raster2 = rasterize(california, raster_template2)
+plot(california_raster2)
+```
+
+## How to convert a raster to a vector object?
+
+This is the opposite of rasterization, which we call spatial vectorization, i.e. convert raster to points, or lines, or polygons.
+
+```{r}
+# convert centroid of grid cells to points
+elev_point = rasterToPoints(elev, spatial = TRUE) %>% st_as_sf()
+plot(elev_point)
+
+# convert raster to contour lines representing lines of continuous height or temperatures (isotherms)
+plot(rasterToContour(elev))
+# rasterVis::contourplot() or tmap::tm_iso() to visulize it
+
+# convert rasters to polygons
+plot(rasterToPolygons(elev)) # each cell will have 5 coords
+plot(grain)
+grain_poly = rasterToPolygons(grain) %>% st_as_sf()
+plot(grain_poly)
+# dissolve intrenal boundaries
+grain_poly2 = grain_poly %>% 
+  group_by(layer) %>%
+  summarize() # without any variables, it will dissolve boundaries!
+plot(grain_poly2)
+```
+
+
+
+## For a raster, how can we get the average of neighbor cells of each cell when available?
+
+```{r}
+# this is 'focal' operation, which takes into account a central cell and its neighbors
+r_focal = focal(elev, w = matrix(1, nrow = 3, ncol = 3), fun = mean)
+plot(r_focal) # the outest cells do not have 9 neighbor cells, thus NA
+```
+
+## For a raster, how can we get the average values of some classifications?
+
+```{r}
+# this is 'zonal' operation
+plot(elev)
+plot(grain)
+zonal(elev, grain, fun = "mean") 
+```
+
+## We have multiple remote sensing files for a specific area, how do we combine them together?
+
+```{r}
+# we can use raster::merge(), which will use data from the first raster
+#     when there are overlaps in areas
+aut = getData("alt", country = "AUT", mask = TRUE)
+ch = getData("alt", country = "CHE", mask = TRUE)
+aut_ch = merge(aut, ch)
+# gdalUtils::mosaic_rasters() is faster
+
+# what if the rasters have different values for overlapped areas??
+mosaic() # can define a function to take care of calls from overlapped areas
+```
+
+## We have a very high resolution shapefile, how can we simplify it to plot faster? 
+
+```{r}
+# sf::st_simplify() uses GEOS implementation of the Douglas-Peucker algorithm 
+#  to reduce the vertex count. 
+# GEOS assumes that the data is in a projected CRS!!
+sf::st_simplify(seine, dTolerance = 2000)  # 2000 m; LINESTRING
+
+# Important for polygon!! Need projected CRS, not geographic CRS
+us_states2163 = st_transform(us_states, 2163) 
+st_simplify(us_states2163, dTolerance = 100000)  # 100 km
+
+# st_simplify() simplifies objects on a per-geometry basis, which can 
+#  result in overlapping and ‘holy’ areal units.
+# rmapshaper::ms_simplify() provides an alternative that overcomes this issue. 
+us_states2163$AREA = as.numeric(us_states2163$AREA)    
+rmapshaper::ms_simplify(us_states2163, keep = 0.01, keep_shapes = TRUE)
+```
+
+## How to get the overlapped areas of two shapefiles?
+
+```{r}
+b = st_sfc(st_point(c(0, 1)), st_point(c(1, 1))) 
+plot(b)
+b = st_buffer(b, dist = 1) # convert points to circles
+plot(b)
+x = b[1]
+y = b[2]
+x_and_y = st_intersection(x, y) # get the overlapped area
+plot(x_and_y, col = "lightgrey", add = TRUE) # color intersecting area
+plot(b); plot(st_difference(x, y), col = "lightgrey", add = TRUE)
+plot(b); plot(st_union(x, y), col = "lightgrey", add = TRUE)
+plot(b); plot(st_sym_difference(x, y), col = "lightgrey", add = TRUE)
+
+# filtering multiple points with another sf object
+bb = st_bbox(b)
+box = st_as_sfc(bb)
+set.seed(2017)
+p = st_sample(x = box, size = 10) # randomly sample points
+plot(box)
+plot(x, add = TRUE)
+plot(y, add = TRUE)
+plot(p, add = TRUE)
+st_intersection(p, x_and_y)
+p[x_and_y]
+```
+
+## How do we merge US states into 4 regions?
+
+```{r}
+plot(us_states["total_pop_15"])
+regions = aggregate(x = us_states[, "total_pop_15"], 
+                    by = list(us_states$REGION),
+                    FUN = sum, na.rm = TRUE)
+regions2 = us_states %>% 
+  group_by(REGION) %>%
+  summarize(pop = sum(total_pop_15, na.rm = TRUE))
+plot(regions)
+plot(regions2)
+```
+
+Both `aggregate()` and `summarize()` combine the geometries and dissolve the boundaries between them using `st_union()`.
+
+## We have different rasters for the same area, how do we align them?
+
+```{r}
+# extend a raster
+elev_2 = extend(elev, c(1, 2), value = 20) 
+# add 1 row (up and down) and 2 columns (left and right) around
+plot(elev_2)
+elev_3 = elev + elev_2
+elev_4 = extend(elev, elev_2, value = 20) # extend by another raster
+identical(elev_2, elev_4)
+
+# change the origin
+origin(elev_4) = c(0.25, 0.25)
+plot(elev_4)
+# and add the original raster
+plot(elev, add = TRUE)
+```
+
+The process of computing values for new pixel locations is also called resampling. In fact, the raster package provides a `resample()` function. It lets you align several raster properties in one go, namely origin, extent and resolution. By default, it uses the bilinear-interpolation.
+
+```{r}
+resample(elev_2, elev)
+```
+
+To align many (possibly hundreds or thousands of) images stored on disk, try `gdalUtils::align_rasters()`.
+
+## I have a data frame with two columns as coordinates, how can I convert it to a sf object?
+
+```{r}
+xyz_sf = data.frame(x = runif(10, -180, 0), y = runif(10, 0, 90), z = rnorm(10)) %>% 
+  st_as_sf(coords = 1:2, crs = 4326)
+```
+
