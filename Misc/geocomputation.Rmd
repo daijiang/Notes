@@ -186,6 +186,17 @@ california_raster2 = rasterize(california, raster_template2)
 plot(california_raster2)
 ```
 
+Another way is that we can put a grid on top of the shapefile, then we can count for each cell.
+
+```{r}
+st_make_grid(sf_object, cellsize = 0.2) %>%
+  st_intersection(sf_object) %>%
+  st_cast("MULTIPOLYGON") %>%
+  st_sf() %>%
+  mutate(cellid = row_number()) -> grid_file
+ st_join(grid_file, sp_richness_sf) # sp_richness_sf contains the values we want to summarise
+```
+
 ## How to convert a raster to a vector object?
 
 This is the opposite of rasterization, which we call spatial vectorization, i.e. convert raster to points, or lines, or polygons.
