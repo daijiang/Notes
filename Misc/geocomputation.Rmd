@@ -232,6 +232,49 @@ r_focal = focal(elev, w = matrix(1, nrow = 3, ncol = 3), fun = mean)
 plot(r_focal) # the outest cells do not have 9 neighbor cells, thus NA
 ```
 
+## For a raster, how to find value of surrounding cell with the lowest value of another variable?
+
+For example, for a temperature raster, how to find the temperature of surrounding cell that has the lowest human population density?
+
+```{r}
+#' Modify x (e.g. temperature) based on y (human population density) and z (elevation)
+#' For each cell in x, searching its surrounding cell (wm = 21: 10 rows each direction) that
+#' has the lowest value of y, and accounting for z of that cell. Then replace x with these
+#' new values.
+#' @param x y z, rasters
+#' @param wm total moving window size
+#' @return a new raster
+near_min_temp = function(x, y, z, wm = 21){
+  v_x = values(x)
+  v_y = values(y)
+  v_z = values(z)
+  x2 = x
+  values(x2) = 1:ncell(x)
+  mid = (wm^2 - 1)/2 + 1 # the focal cell
+  ridx = getValuesFocal(x2, ngb = wm)
+  new_v = apply(ridx, 1, function(i){
+    vi_y = v_y[i] # values of y in these cells
+    wi = which.min(vi_y) # the nth cell that has the min value of y
+    if(length(wi) == 0){ # all NAs for y
+      out = v_x[i[mid]] # keep original value
+    } else {
+      out = v_x[i[wi]] # the value of x of the cell has lowest value of y
+      # diff in elev?
+      elev_new = v_z[i[wi]]
+      elev_orig = v_z[i[mid]]
+      if(!is.na(elev_new) & !is.na(elev_orig) & elev_new > elev_orig) 
+        out = out + (elev_new - elev_orig) * 0.0065 # 0.65 per 100 m
+    }
+    out
+  })
+  new_v2 = unlist(new_v)
+  # ww = which(!is.na(new_v2 & is.na(v_x)))
+  values(x) = ifelse(new_v2 < v_x & !is.na(new_v2), new_v2, v_x) # update value of x
+  # values(x)[ww] = new_v2[ww]
+  x
+}
+```
+
 ## For a raster, how can we get the average values of some classifications?
 
 ```{r}
