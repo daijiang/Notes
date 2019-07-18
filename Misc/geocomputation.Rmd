@@ -122,7 +122,7 @@ plot(srtm_masked)
 plot(srtm_masked_inv)
 ```
 
-## If we have a raster, how can we get values for some specific points?
+## If we have a raster, how can we get values for some specific points / lines / polygons?
 
 This is raster extraction. The reverse of raster extraction — assigning raster cell values based on vector objects — is rasterization. An issue with `raster::extract()`, however, is that it is relatively slow. If this is a problem it is useful to know about alternatives and work-arounds:
 
