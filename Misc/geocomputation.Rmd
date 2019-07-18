@@ -202,6 +202,17 @@ st_make_grid(sf_object, cellsize = 0.2) %>%
 This is the opposite of rasterization, which we call spatial vectorization, i.e. convert raster to points, or lines, or polygons.
 
 ```{r}
+elev = raster(nrows = 6, ncols = 6, res = 0.5,
+              xmn = -1.5, xmx = 1.5, ymn = -1.5, ymx = 1.5,
+              vals = 1:36)
+
+grain_order = c("clay", "silt", "sand")
+grain_char = sample(grain_order, 36, replace = TRUE)
+grain_fact = factor(grain_char, levels = grain_order)
+grain = raster(nrows = 6, ncols = 6, res = 0.5, 
+               xmn = -1.5, xmx = 1.5, ymn = -1.5, ymx = 1.5,
+               vals = grain_fact)
+               
 # convert centroid of grid cells to points
 elev_point = rasterToPoints(elev, spatial = TRUE) %>% st_as_sf()
 plot(elev_point)
