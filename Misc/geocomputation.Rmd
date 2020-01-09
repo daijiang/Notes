@@ -405,3 +405,11 @@ xyz_sf = data.frame(x = runif(10, -180, 0), y = runif(10, 0, 90), z = rnorm(10))
   st_as_sf(coords = 1:2, crs = 4326)
 ```
 
+## Aggregate large raster file
+
+```{r}
+gdalUtils::gdalwarp(srcfile = "xxx.img",
+                    dstfile = "yyy.tif", t_srs = new_proj,
+                    r = 'mode',
+                    multi = TRUE, tr = c(900, 900), output_Raster = TRUE)
+```
